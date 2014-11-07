@@ -80,23 +80,20 @@ class TimerHandle(trollius.Handle):
         self._timer = None
 
     def _run(self):
-        self._loop._timers.remove(self._timer)
         super(TimerHandle, self)._run()
 
     def cancel(self):
         super(TimerHandle, self).cancel()
         self._timer.cancel()
-        self._loop._timers.remove(self._timer)
 
 
 class EventLoop(BaseEventLoop):
     def __init__(self):
         super(EventLoop, self).__init__()
         self._pool = eventlet.GreenPool()
-        self._timers = []
-        self._in_executor = []
         # Queue used by call_soon_threadsafe()
         self._queue = ThreadQueue(self)
+        self._run = None
 
     def _call(self, handle):
         if handle._cancelled:
@@ -116,44 +113,48 @@ class EventLoop(BaseEventLoop):
         self._queue.put(handle)
         return handle
 
-    def _call_later(self, handle):
-        self._timers.remove(handle._timer)
-        self._call(handle)
-
     def call_later(self, delay, callback, *args):
-        handle = TimerHandle(callback, args, self)
+        if 0:
+            handle = TimerHandle(callback, args, self)
 
-        # inline spawn_after() to get the timer object, to be able
-        # to cancel directly the timer
-        hub = hubs.get_hub()
-        greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
-        timer = hub.schedule_call_global(delay, greenthread.switch,
-                                         handle._run)
+            # inline spawn_after() to get the timer object, to be able
+            # to cancel directly the timer
+            hub = hubs.get_hub()
+            greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
+            timer = hub.schedule_call_global(delay, greenthread.switch,
+                                             handle._run)
 
-        handle._timer = timer
-        self._timers.append(timer)
-        return handle
+            handle._timer = timer
+            return handle
+        else:
+            handle = trollius.Handle(callback, args, self)
+            greenthread = eventlet.spawn_after(delay, self._call, handle)
+            return handle
 
     def call_at(self, when, callback, *args):
         delay = when - self.time()
         return self.call_later(delay, callback, *args)
 
-    def run_in_executor(self, executor, callback, *args):
-        # FIXME: use eventlet.tpool as the default executor?
-        fut = super(EventLoop, self).run_in_executor(executor, callback, *args)
-        if not fut.done():
-            self._in_executor.append(fut)
-        return fut
+    # FIXME: run_in_executor(): use eventlet.tpool as the default executor?
+
+    def stop(self):
+        if self._run is None:
+            # not running or stop already scheduled
+            return
+        self._run.send("stop")
+        self._run = None
 
     def run_forever(self):
-        # FIXME: don't use polling
-        while True:
-            self._in_executor = [fut for fut in self._in_executor
-                                 if not fut.done()]
-            if not self._timers and not self._in_executor:
-                return
-            eventlet.sleep(1.0)
-        self._pool.waitall()
+        if self._run is not None:
+            raise RuntimeError("reentrant call to run_forever()")
+
+        try:
+            self._run = eventlet.event.Event()
+            # use a local copy because stop() clears the attribute
+            run = self._run
+            run.wait()
+        finally:
+            self._run = None
 
     def close(self):
         super(EventLoop, self).close()
@@ -161,9 +162,6 @@ class EventLoop(BaseEventLoop):
 
     def _not_implemented(self):
         raise NotImplementedError("method not supported in aiogreen yet")
-
-    def stop(self):
-        self._not_implemented()
 
     def run_until_complete(self, future):
         self._not_implemented()
