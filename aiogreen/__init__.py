@@ -1,5 +1,6 @@
 import trollius
 from trollius.base_events import BaseEventLoop
+from eventlet import hubs
 import eventlet
 import sys
 try:
@@ -73,6 +74,21 @@ class ThreadQueue:
         self._greenthread.wait()
 
 
+class TimerHandle(trollius.Handle):
+    def __init__(self, callback, args, loop):
+        super(TimerHandle, self).__init__(callback, args, loop)
+        self._timer = None
+
+    def _run(self):
+        self._loop._timers.remove(self._timer)
+        super(TimerHandle, self)._run()
+
+    def cancel(self):
+        super(TimerHandle, self).cancel()
+        self._timer.cancel()
+        self._loop._timers.remove(self._timer)
+
+
 class EventLoop(BaseEventLoop):
     def __init__(self):
         super(EventLoop, self).__init__()
@@ -101,15 +117,21 @@ class EventLoop(BaseEventLoop):
         return handle
 
     def _call_later(self, handle):
-        greenthread = eventlet.getcurrent()
-        self._timers.remove(greenthread)
+        self._timers.remove(handle._timer)
         self._call(handle)
 
     def call_later(self, delay, callback, *args):
-        # FIXME: cancelling the handle should unschedule the timer
-        handle = trollius.Handle(callback, args, self)
-        greenthread = eventlet.spawn_after(delay, self._call_later, handle)
-        self._timers.append(greenthread)
+        handle = TimerHandle(callback, args, self)
+
+        # inline spawn_after() to get the timer object, to be able
+        # to cancel directly the timer
+        hub = hubs.get_hub()
+        greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
+        timer = hub.schedule_call_global(delay, greenthread.switch,
+                                         handle._run)
+
+        handle._timer = timer
+        self._timers.append(timer)
         return handle
 
     def call_at(self, when, callback, *args):
