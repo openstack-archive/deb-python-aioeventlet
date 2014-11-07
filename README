@@ -1,0 +1,13 @@
+asyncio event loop scheduling callbacks in eventlet.
+
+Implemented:
+
+* call_soon
+* call_later
+* call_at
+
+To do:
+
+* stop
+* run_until_complete
+* run_forever
