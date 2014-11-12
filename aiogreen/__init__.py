@@ -93,6 +93,9 @@ class EventLoop(BaseEventLoop):
         # Queue used by call_soon_threadsafe()
         self._queue = ThreadQueue(self)
         self._run = None
+        if self.get_debug():
+            hub = hubs.get_hub()
+            hub.debug_blocking = True
 
     def time(self):
         # FIXME: is it safe to store the hub in an attribute of the event loop?
