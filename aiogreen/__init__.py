@@ -11,19 +11,10 @@ try:
 except ImportError:
     import queue
 
-if sys.version_info < (3,):
-    threading = eventlet.patcher.original('threading')
-    _get_thread_ident = threading._get_ident
-    # FIXME: get the main thread on Python 2
-    _main_thread_id = _get_thread_ident()
-else:
-    # Python 3
-    threading = eventlet.patcher.original('threading')
-    _get_thread_ident = threading.get_ident
-    _main_thread_id = threading.main_thread().ident
+threading = eventlet.patcher.original('threading')
 
 def _is_main_thread():
-    return _get_thread_ident() == _main_thread_id
+    return isinstance(threading.current_thread(), threading._MainThread)
 
 class EventLoopPolicy(trollius.AbstractEventLoopPolicy):
     def __init__(self):
