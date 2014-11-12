@@ -1,8 +1,10 @@
-import trollius
-from trollius.base_events import BaseEventLoop
 from eventlet import hubs
+from trollius import futures
+from trollius import tasks
+from trollius.base_events import BaseEventLoop
 import eventlet
 import sys
+import trollius
 try:
     # Python 2
     import Queue as queue
@@ -160,8 +162,25 @@ class EventLoop(BaseEventLoop):
         super(EventLoop, self).close()
         self._queue.stop()
 
-    def _not_implemented(self):
-        raise NotImplementedError("method not supported in aiogreen yet")
-
     def run_until_complete(self, future):
-        self._not_implemented()
+        # FIXME: don't copy/paste Trollius code, but
+        # fix Trollius to call self.stop?
+        self._check_closed()
+
+        new_task = not isinstance(future, futures._FUTURE_CLASSES)
+        future = tasks.async(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+
+        def stop(fut):
+            self.stop()
+
+        future.add_done_callback(stop)
+        self.run_forever()
+        future.remove_done_callback(stop)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+
+        return future.result()
