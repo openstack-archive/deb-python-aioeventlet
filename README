@@ -21,6 +21,7 @@ Not supported:
 
 Todo:
 
+* call_soon(func1); stop(); call_soon(func2) must not executed func2
 * Support eventlet without monkey-patching
 * Test with Python 2 and 3
 * Test with Trollius and asyncio
