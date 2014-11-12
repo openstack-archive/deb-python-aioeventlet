@@ -2,16 +2,17 @@ asyncio event loop scheduling callbacks in eventlet.
 
 Implemented:
 
-* call_soon()
-* call_later()
 * call_at()
+* call_later()
+* call_soon()
+* run_forever()
 * run_in_executor()
+* run_until_complete()
+* stop()
 * coroutines and tasks
 
 Not supported:
 
-* stop
-* run_until_complete
 * run an event loop in a thread different than the main thread
 * sockets
 * pipes
