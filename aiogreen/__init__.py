@@ -27,16 +27,16 @@ class EventLoopPolicy(trollius.AbstractEventLoopPolicy):
     def __init__(self):
         self._loop = None
 
-    def new_event_loop(self):
+    def get_event_loop(self):
         if not _is_main_thread():
             raise NotImplementedError("currently aiogreen can only run in the main thread")
-        if self._loop is not None:
-            raise NotImplementedError("cannot run two event loops in the same thread")
         self._loop = EventLoop()
         return self._loop
 
-    def get_event_loop(self):
-        return self.new_event_loop()
+    def new_event_loop(self):
+        if self._loop is not None:
+            raise NotImplementedError("cannot run two event loops in the same thread")
+        return self.get_event_loop()
 
     def set_event_loop(self, loop):
         if self._loop is not None:
