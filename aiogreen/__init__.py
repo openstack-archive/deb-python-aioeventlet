@@ -97,6 +97,12 @@ class EventLoop(BaseEventLoop):
         self._queue = ThreadQueue(self)
         self._run = None
 
+    def time(self):
+        # FIXME: is it safe to store the hub in an attribute of the event loop?
+        # If yes, get the hub when the event loop is created
+        hub = hubs.get_hub()
+        return hub.clock()
+
     def _call(self, handle):
         if handle._cancelled:
             return
@@ -138,6 +144,8 @@ class EventLoop(BaseEventLoop):
         return self.call_later(delay, callback, *args)
 
     # FIXME: run_in_executor(): use eventlet.tpool as the default executor?
+    # It avoids the dependency to concurrent.futures, but later it would be
+    # better to use concurrent.futures. So... What is the best?
 
     def stop(self):
         if self._run is None:
