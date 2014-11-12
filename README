@@ -14,5 +14,14 @@ Implemented:
 Not supported:
 
 * run an event loop in a thread different than the main thread
-* sockets
-* pipes
+* file descriptors: add_reader, add_writer
+* sockets: create_connection, create_server, sock_recv
+* pipes: connect_read_pipe
+* subprocesses: need pipes
+* signal handlers: add_signal_handler
+
+Todo:
+
+* Test with Python 2 and 3
+* Test with Trollius and asyncio
+* Glue to ease debug: keep traceback between Handle, coroutine and greenthread
