@@ -17,10 +17,11 @@ Not supported:
 * sockets: create_connection, create_server, sock_recv
 * pipes: connect_read_pipe
 * subprocesses: need pipes
-* signal handlers: add_signal_handler
+* signal handlers: add_signal_handler (only for pyevent hub?)
 
 Todo:
 
+* Support eventlet without monkey-patching
 * Test with Python 2 and 3
 * Test with Trollius and asyncio
 * Glue to ease debug: keep traceback between Handle, coroutine and greenthread

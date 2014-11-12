@@ -1,9 +1,13 @@
 from eventlet import hubs
 from trollius import futures
+from trollius import selector_events
 from trollius import selectors
 from trollius import tasks
 from trollius.base_events import BaseEventLoop
+import errno
+import eventlet.greenio
 import eventlet.hubs.hub
+import socket
 import sys
 import trollius
 try:
@@ -84,6 +88,11 @@ class TimerHandle(trollius.Handle):
     def cancel(self):
         super(TimerHandle, self).cancel()
         self._timer.cancel()
+
+
+class SocketTransport(selector_events._SelectorSocketTransport):
+    def __repr__(self):
+        return '<%s fd=%s>' % (self.__class__.__name__, self._sock_fd)
 
 
 class EventLoop(BaseEventLoop):
@@ -225,3 +234,18 @@ class EventLoop(BaseEventLoop):
 
     def remove_writer(self, fd):
         return self._remove_fd(_WRITE, fd)
+
+    def sock_connect(self, sock, address):
+        # code adapted from GreenSocket.connect(),
+        # the version without timeout
+        fd = sock.fileno()
+        while not eventlet.greenio.socket_connect(sock, address):
+            try:
+                hubs.trampoline(fd, write=True)
+            except hubs.IOClosed:
+                raise socket.error(errno.EBADFD)
+            eventlet.greenio.socket_checkerr(sock)
+
+    def _make_socket_transport(self, sock, protocol, waiter=None,
+                               extra=None, server=None):
+        return SocketTransport(self, sock, protocol, waiter, extra, server)
