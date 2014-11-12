@@ -1,8 +1,9 @@
 from eventlet import hubs
 from trollius import futures
+from trollius import selectors
 from trollius import tasks
 from trollius.base_events import BaseEventLoop
-import eventlet
+import eventlet.hubs.hub
 import sys
 import trollius
 try:
@@ -13,8 +14,13 @@ except ImportError:
 
 threading = eventlet.patcher.original('threading')
 
+_READ = eventlet.hubs.hub.READ
+_WRITE = eventlet.hubs.hub.WRITE
+
+
 def _is_main_thread():
     return isinstance(threading.current_thread(), threading._MainThread)
+
 
 class EventLoopPolicy(trollius.AbstractEventLoopPolicy):
     def __init__(self):
@@ -183,3 +189,36 @@ class EventLoop(BaseEventLoop):
             raise RuntimeError('Event loop stopped before Future completed.')
 
         return future.result()
+
+    def _throwback(self):
+        # FIXME: do something?
+        pass
+
+    def _add_fd(self, event_type, fd, callback, args):
+        hub = hubs.get_hub()
+        fd = selectors._fileobj_to_fd(fd)
+        def func(fd):
+            return callback(*args)
+        hub.add(event_type, fd, func, self._throwback, None)
+
+    def add_reader(self, fd, callback, *args):
+        self._add_fd(_READ, fd, callback, args)
+
+    def add_writer(self, fd, callback, *args):
+        self._add_fd(_WRITE, fd, callback, args)
+
+    def _remove_fd(self, event_type, fd):
+        hub = hubs.get_hub()
+        fd = selectors._fileobj_to_fd(fd)
+        try:
+            listener = hub.listeners[event_type][fd]
+        except KeyError:
+            return False
+        hub.remove(listener)
+        return True
+
+    def remove_reader(self, fd):
+        return self._remove_fd(_READ, fd)
+
+    def remove_writer(self, fd):
+        return self._remove_fd(_WRITE, fd)

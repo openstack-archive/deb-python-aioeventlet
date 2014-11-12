@@ -14,7 +14,6 @@ Implemented:
 Not supported:
 
 * run an event loop in a thread different than the main thread
-* file descriptors: add_reader, add_writer
 * sockets: create_connection, create_server, sock_recv
 * pipes: connect_read_pipe
 * subprocesses: need pipes
