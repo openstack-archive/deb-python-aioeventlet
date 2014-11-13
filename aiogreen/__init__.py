@@ -92,6 +92,8 @@ class TimerHandle(trollius.Handle):
 
 class SocketTransport(selector_events._SelectorSocketTransport):
     def __repr__(self):
+        # override repr because _SelectorSocketTransport depends on
+        # loop._selector
         return '<%s fd=%s>' % (self.__class__.__name__, self._sock_fd)
 
 
