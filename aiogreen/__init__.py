@@ -1,4 +1,3 @@
-from eventlet import hubs
 from trollius import futures
 from trollius import selector_events
 from trollius import selectors
@@ -88,21 +87,20 @@ class SocketTransport(selector_events._SelectorSocketTransport):
 class EventLoop(BaseEventLoop):
     def __init__(self):
         super(EventLoop, self).__init__()
+        # Store a reference to the hub to ensure
+        # that we always use the same hub
+        self._hub = eventlet.hubs.get_hub()
         self._pool = eventlet.GreenPool()
         # Queue used by call_soon_threadsafe()
-        self._queue = ThreadQueue(self)
+        self._thread_queue = ThreadQueue(self)
         self._stop_event = None
         if self.get_debug():
-            hub = hubs.get_hub()
-            hub.debug_blocking = True
+            self._hub.debug_blocking = True
         self._run_once_scheduled = False
         self._run_once_timer = None
 
     def time(self):
-        # FIXME: is it safe to store the hub in an attribute of the event loop?
-        # If yes, get the hub when the event loop is created
-        hub = hubs.get_hub()
-        return hub.clock()
+        return self._hub.clock()
 
     def _call(self, handle):
         if handle._cancelled:
@@ -200,13 +198,10 @@ class EventLoop(BaseEventLoop):
             self._run_once_timer[1].cancel()
             self._run_once_timer = None
 
-        # inline spawn_after() to get the timer object, to be able
-        # to cancel directly the timer
-        hub = hubs.get_hub()
-        greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
-        print("schedule in %s seconds" % delay, when)
-        timer = hub.schedule_call_global(delay, greenthread.switch,
-                                         self._run_once, (), {})
+        greenthread = eventlet.greenthread.GreenThread(self._hub.greenlet)
+        timer = self._hub.schedule_call_global(delay,
+                                               greenthread.switch,
+                                               self._run_once, (), {})
         self._run_once_timer = (when, timer)
 
     def _reschedule(self):
@@ -223,7 +218,7 @@ class EventLoop(BaseEventLoop):
 
     def call_soon_threadsafe(self, callback, *args):
         handle = trollius.Handle(callback, args, self)
-        self._queue.put(handle)
+        self._thread_queue.put(handle)
         return handle
 
     def call_at(self, when, callback, *args):
@@ -268,7 +263,7 @@ class EventLoop(BaseEventLoop):
 
     def close(self):
         super(EventLoop, self).close()
-        self._queue.stop()
+        self._thread_queue.stop()
 
     def run_until_complete(self, future):
         # FIXME: don't copy/paste Trollius code, but
@@ -298,11 +293,10 @@ class EventLoop(BaseEventLoop):
         pass
 
     def _add_fd(self, event_type, fd, callback, args):
-        hub = hubs.get_hub()
         fd = selectors._fileobj_to_fd(fd)
         def func(fd):
             return callback(*args)
-        hub.add(event_type, fd, func, self._throwback, None)
+        self._hub.add(event_type, fd, func, self._throwback, None)
 
     def add_reader(self, fd, callback, *args):
         self._add_fd(_READ, fd, callback, args)
@@ -311,13 +305,12 @@ class EventLoop(BaseEventLoop):
         self._add_fd(_WRITE, fd, callback, args)
 
     def _remove_fd(self, event_type, fd):
-        hub = hubs.get_hub()
         fd = selectors._fileobj_to_fd(fd)
         try:
-            listener = hub.listeners[event_type][fd]
+            listener = self._hub.listeners[event_type][fd]
         except KeyError:
             return False
-        hub.remove(listener)
+        self._hub.remove(listener)
         return True
 
     def remove_reader(self, fd):
@@ -332,8 +325,8 @@ class EventLoop(BaseEventLoop):
         fd = sock.fileno()
         while not eventlet.greenio.socket_connect(sock, address):
             try:
-                hubs.trampoline(fd, write=True)
-            except hubs.IOClosed:
+                eventlet.hubs.trampoline(fd, write=True)
+            except eventlet.hubs.IOClosed:
                 raise socket.error(errno.EBADFD)
             eventlet.greenio.socket_checkerr(sock)
 
