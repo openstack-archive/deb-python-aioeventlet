@@ -84,6 +84,72 @@ class SocketTransport(selector_events._SelectorSocketTransport):
         return '<%s fd=%s>' % (self.__class__.__name__, self._sock_fd)
 
 
+class _Scheduler:
+    def __init__(self, loop):
+        self._loop = loop
+        self._scheduled = False
+        self._timer = None
+
+    def _run_once_soon(self):
+        if not self._scheduled:
+            # _scheduler.unschedule() was called, the event loop is no more running
+            assert self._loop._stop_event is None
+            return
+
+        self.unschedule_timer()
+        self._loop._run_once()
+
+    def schedule(self):
+        """Schedule a call to _run_once()."""
+        if self._scheduled:
+            return
+        # FIXME: is it thread-safe and greenthread-safe?
+        self._scheduled = True
+        self.unschedule_timer()
+        self._loop._pool.spawn(self._run_once_soon)
+        # FIXME: unschedule the greenthread if the loop is interrupted or something like that?
+
+    def unschedule(self):
+        self._scheduled = False
+        # FIXME: cancel greenthread scheduled by _schedule()
+
+    def schedule_timer(self, when):
+        # FIXME: is this function greenthread-safe?
+        if self._scheduled:
+            return
+
+        delay = when - self._loop.time()
+        if delay <= 0:
+            self.schedule()
+            return
+
+        if self._timer is not None:
+            if self._timer[0] <= when:
+                # a timer will ring earlier
+                return
+            # a timer was scheduled later
+            self._timer[1].cancel()
+            self._timer = None
+
+        hub = self._loop._hub
+        greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
+        greentimer = hub.schedule_call_global(delay,
+                                              greenthread.switch,
+                                              self._loop._run_once, (), {})
+        self._timer = (when, greentimer)
+
+    def unschedule_timer(self):
+        if not self._timer:
+            return
+        when, greentimer = self._timer
+        self._timer = None
+        greentimer.cancel()
+
+    def stop(self):
+        self.unschedule()
+        self.unschedule_timer()
+
+
 class EventLoop(BaseEventLoop):
     def __init__(self):
         super(EventLoop, self).__init__()
@@ -96,8 +162,7 @@ class EventLoop(BaseEventLoop):
         self._stop_event = None
         if self.get_debug():
             self._hub.debug_blocking = True
-        self._run_once_scheduled = False
-        self._run_once_timer = None
+        self._scheduler = _Scheduler(self)
 
     def time(self):
         return self._hub.clock()
@@ -109,19 +174,10 @@ class EventLoop(BaseEventLoop):
 
     def _call_soon_handle(self, handle):
         self._ready.append(handle)
-        self._schedule()
+        self._scheduler.schedule()
 
     def is_running(self):
         return (self._stop_event is not None)
-
-    def _run_once_soon(self):
-        if not self._run_once_scheduled:
-            # _unschedule() was called, the event loop is no more running
-            assert self._stop_event is None
-            return
-
-        self._unschedule_timer()
-        self._run_once()
 
     def _run_once(self):
         run = self._stop_event
@@ -153,63 +209,15 @@ class EventLoop(BaseEventLoop):
             # and _schedule() is called?
             handle._run()
 
-        self._run_once_scheduled = False
-        self._run_once_timer = None
-
+        self._scheduler.stop()
         self._reschedule()
-
-    def _unschedule_timer(self):
-        if not self._run_once_timer:
-            return
-        when, timer = self._run_once_timer
-        self._run_once_timer = None
-        timer.cancel()
-
-    def _schedule(self):
-        """Schedule a call to _run_once()."""
-        if self._run_once_scheduled:
-            return
-        # FIXME: is it thread-safe and greenthread-safe?
-        self._run_once_scheduled = True
-        self._unschedule_timer()
-        self._pool.spawn(self._run_once_soon)
-
-        # FIXME: unschedule the greenthread if the loop is interrupted or something like that?
-
-    def _unschedule(self):
-        self._run_once_scheduled = False
-        # FIXME: cancel greenthread scheduled by _schedule()
-
-    def _schedule_timer(self, when):
-        # FIXME: is this function greenthread-safe?
-        if self._run_once_scheduled:
-            return
-
-        delay = when - self.time()
-        if delay <= 0:
-            self._schedule()
-            return
-
-        if self._run_once_timer is not None:
-            if self._run_once_timer[0] <= when:
-                # a timer will ring earlier
-                return
-            # a timer was scheduled later
-            self._run_once_timer[1].cancel()
-            self._run_once_timer = None
-
-        greenthread = eventlet.greenthread.GreenThread(self._hub.greenlet)
-        timer = self._hub.schedule_call_global(delay,
-                                               greenthread.switch,
-                                               self._run_once, (), {})
-        self._run_once_timer = (when, timer)
 
     def _reschedule(self):
         if self._ready:
-            self._schedule()
+            self._scheduler.schedule()
         elif self._scheduled:
             handle = self._scheduled[0]
-            self._schedule_timer(handle._when)
+            self._scheduler.schedule_timer(handle._when)
 
     def call_soon(self, callback, *args):
         handle = trollius.Handle(callback, args, self)
@@ -224,7 +232,7 @@ class EventLoop(BaseEventLoop):
     def call_at(self, when, callback, *args):
         timer = trollius.TimerHandle(when, callback, args, self)
         heapq.heappush(self._scheduled, timer)
-        self._schedule_timer(when)
+        self._scheduler.schedule_timer(when)
         return timer
 
     def call_later(self, delay, callback, *args):
@@ -258,8 +266,7 @@ class EventLoop(BaseEventLoop):
             run.wait()
         finally:
             self._stop_event = None
-            self._unschedule()
-            self._unschedule_timer()
+            self._scheduler.stop()
 
     def close(self):
         super(EventLoop, self).close()
