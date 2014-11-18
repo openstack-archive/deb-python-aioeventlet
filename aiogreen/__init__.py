@@ -5,6 +5,7 @@ from trollius import tasks
 from trollius.base_events import BaseEventLoop
 import errno
 import eventlet.greenio
+import eventlet.semaphore
 import eventlet.hubs.hub
 import heapq
 import socket
@@ -85,69 +86,79 @@ class SocketTransport(selector_events._SelectorSocketTransport):
 
 
 class _Scheduler:
+    """Schedule a call to loop._run_once()."""
+
     def __init__(self, loop):
         self._loop = loop
         self._scheduled = False
         self._timer = None
+        self._lock = eventlet.semaphore.Semaphore()
 
     def _run_once_soon(self):
-        if not self._scheduled:
-            # _scheduler.unschedule() was called, the event loop is no more running
-            assert self._loop._stop_event is None
-            return
+        with self._lock:
+            if not self._scheduled:
+                # stop() was called, the event loop is no more running
+                assert not self._loop.is_running()
+                return
 
-        self.unschedule_timer()
+            self._unschedule_timer_unlocked()
+
         self._loop._run_once()
 
     def schedule(self):
-        """Schedule a call to _run_once()."""
+        with self._lock:
+            self._schedule_unlocked()
+
+    def _schedule_unlocked(self):
         if self._scheduled:
             return
-        # FIXME: is it thread-safe and greenthread-safe?
         self._scheduled = True
-        self.unschedule_timer()
+        self._unschedule_timer_unlocked()
+        # FIXME: deadlock if _run_once_soon is called immediatly?
         self._loop._pool.spawn(self._run_once_soon)
         # FIXME: unschedule the greenthread if the loop is interrupted or something like that?
 
-    def unschedule(self):
+    def _unschedule_unlocked(self):
         self._scheduled = False
-        # FIXME: cancel greenthread scheduled by _schedule()
+        # FIXME: optimize: cancel greenthread scheduled by _schedule()
 
     def schedule_timer(self, when):
-        # FIXME: is this function greenthread-safe?
-        if self._scheduled:
-            return
-
-        delay = when - self._loop.time()
-        if delay <= 0:
-            self.schedule()
-            return
-
-        if self._timer is not None:
-            if self._timer[0] <= when:
-                # a timer will ring earlier
+        with self._lock:
+            if self._scheduled:
                 return
-            # a timer was scheduled later
-            self._timer[1].cancel()
-            self._timer = None
 
-        hub = self._loop._hub
-        greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
-        greentimer = hub.schedule_call_global(delay,
-                                              greenthread.switch,
-                                              self._loop._run_once, (), {})
-        self._timer = (when, greentimer)
+            delay = when - self._loop.time()
+            if delay <= 0:
+                self._schedule_unlocked()
+                return
 
-    def unschedule_timer(self):
-        if not self._timer:
+            if self._timer is not None:
+                if self._timer[0] <= when:
+                    # a timer will ring earlier
+                    return
+                # a timer was scheduled later
+                self._timer[1].cancel()
+                self._timer = None
+
+            hub = self._loop._hub
+            greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
+            # FIXME: deadlock if _run_once() is called immediatly?
+            greentimer = hub.schedule_call_global(delay,
+                                                  greenthread.switch,
+                                                  self._loop._run_once, (), {})
+            self._timer = (when, greentimer)
+
+    def _unschedule_timer_unlocked(self):
+        if self._timer is None:
             return
         when, greentimer = self._timer
         self._timer = None
         greentimer.cancel()
 
     def stop(self):
-        self.unschedule()
-        self.unschedule_timer()
+        with self._lock:
+            self._unschedule_unlocked()
+            self._unschedule_timer_unlocked()
 
 
 class EventLoop(BaseEventLoop):
