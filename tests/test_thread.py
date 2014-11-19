@@ -53,3 +53,8 @@ class ThreadTests(tests.TestCase):
         fut = self.loop.run_in_executor(None, work)
         self.loop.run_until_complete(fut)
         self.assertIsNone(result['loop'])
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()

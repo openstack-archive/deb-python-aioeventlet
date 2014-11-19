@@ -25,3 +25,8 @@ class AddReaderTests(tests.TestCase):
 
         self.loop.run_forever()
         self.assertEqual(result['received'], b'abc')
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()

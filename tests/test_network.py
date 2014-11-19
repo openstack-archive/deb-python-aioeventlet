@@ -73,3 +73,8 @@ class NetworkTests(tests.TestCase):
         self.loop.run_forever()
         self.assertEqual(proto.state, 'closed')
         self.assertEqual(proto.received, message)
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()
