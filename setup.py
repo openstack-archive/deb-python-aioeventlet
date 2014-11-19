@@ -43,7 +43,7 @@ install_options = {
         "License :: OSI Approved :: Apache Software License",
     ],
 
-    "packages": ["aiogreen"],
+    "py_modules": ["aiogreen"],
     #"test_suite": "runtests.runtests",
 }
 if SETUPTOOLS:
