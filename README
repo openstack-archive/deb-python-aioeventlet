@@ -1,7 +1,8 @@
 asyncio event loop scheduling callbacks in eventlet.
 
-See also the Trollius project:
-http://trollius.readthedocs.org/
+* Trollius project: http://trollius.readthedocs.org/
+* aiogreen at PyPI: https://pypi.python.org/pypi/aiogreen
+
 
 Status
 ======
