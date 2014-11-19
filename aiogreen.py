@@ -1,8 +1,13 @@
+import sys
 try:
     import asyncio
     from asyncio import selector_events
     from asyncio import selectors
     from asyncio.base_events import BaseEventLoop
+    if sys.platform == 'win32':
+        from asyncio.windows_utils import socketpair
+    else:
+        from socket import socketpair
 
     _FUTURE_CLASSES = (asyncio.Future,)
 except ImportError:
@@ -17,6 +22,10 @@ except ImportError:
     else:
         # Trollius 1.0.1 and newer
         _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
+    if sys.platform == 'win32':
+        from trollius.windows_utils import socketpair
+    else:
+        from socket import socketpair
 import errno
 import eventlet.greenio
 import eventlet.semaphore
@@ -91,7 +100,7 @@ class _ThreadQueue:
 
     def start(self):
         assert self._ssock is None
-        self._ssock, self._csock = socket.socketpair()
+        self._ssock, self._csock = socketpair()
         self._ssock.setblocking(False)
         self._csock.setblocking(False)
         self._loop.add_reader(self._ssock.fileno(), self._consume)
