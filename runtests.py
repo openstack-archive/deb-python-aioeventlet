@@ -277,8 +277,13 @@ def runtests():
     finder = TestsFinder(args.testsdir, includes, excludes)
     if catchbreak:
         installHandler()
-    import trollius.coroutines
-    if trollius.coroutines._DEBUG:
+    import tests
+    if hasattr(tests.asyncio, 'coroutines'):
+        debug = tests.asyncio.coroutines._DEBUG
+    else:
+        # Tulip <= 3.4.1
+        debug = tests.asyncio.tasks._DEBUG
+    if debug:
         print("Run tests in debug mode")
     else:
         print("Run tests in release mode")
