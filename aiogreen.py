@@ -324,10 +324,12 @@ class EventLoop(BaseEventLoop):
 
     def stop(self):
         if self._stop_event is None:
-            # not running or stop already scheduled
+            # not running
+            return
+        if self._stop_event.ready():
+            # stop already scheduled
             return
         self._stop_event.send("stop")
-        self._stop_event = None
 
     def run_forever(self):
         if self._stop_event is not None:
@@ -341,6 +343,8 @@ class EventLoop(BaseEventLoop):
             self._stop_event = eventlet.event.Event()
             # use a local copy because stop() clears the attribute
             stop_event = self._stop_event
+
+            # sleep until the stop() method is called
             stop_event.wait()
         finally:
             self._stop_event = None
