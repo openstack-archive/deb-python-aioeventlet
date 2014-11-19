@@ -1,4 +1,16 @@
 import sys
+import errno
+import eventlet.greenio
+import eventlet.semaphore
+import eventlet.hubs.hub
+import functools
+import heapq
+socket = eventlet.patcher.original('socket')
+try:
+    # Python 2
+    import Queue as queue
+except ImportError:
+    import queue
 try:
     import asyncio
     from asyncio import selector_events
@@ -6,9 +18,10 @@ try:
     from asyncio.base_events import BaseEventLoop
     from asyncio.base_events import _check_resolved_address
     if sys.platform == 'win32':
+        # FIXME: does it work with eventlet monkey-patching?
         from asyncio.windows_utils import socketpair
     else:
-        from socket import socketpair
+        socketpair = socket.socketpair
 
     _FUTURE_CLASSES = (asyncio.Future,)
 except ImportError:
@@ -25,21 +38,10 @@ except ImportError:
         # Trollius >= 1.0.1
         _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
     if sys.platform == 'win32':
+        # FIXME: does it work with eventlet monkey-patching?
         from trollius.windows_utils import socketpair
     else:
-        from socket import socketpair
-import errno
-import eventlet.greenio
-import eventlet.semaphore
-import eventlet.hubs.hub
-import functools
-import heapq
-import socket
-try:
-    # Python 2
-    import Queue as queue
-except ImportError:
-    import queue
+        socketpair = socket.socketpair
 
 threading = eventlet.patcher.original('threading')
 
