@@ -1,14 +1,25 @@
-from trollius import futures
-from trollius import selector_events
-from trollius import selectors
-from trollius.base_events import BaseEventLoop
+try:
+    import asyncio
+    from asyncio import futures
+    from asyncio import selector_events
+    from asyncio import selectors
+    from asyncio.base_events import BaseEventLoop
+
+    _FUTURE_CLASSES = (asyncio.Future,)
+except ImportError:
+    import trollius as asyncio
+    from trollius import futures
+    from trollius import selector_events
+    from trollius import selectors
+    from trollius.base_events import BaseEventLoop
+
+    _FUTURE_CLASSES = futures._FUTURE_CLASSES
 import errno
 import eventlet.greenio
 import eventlet.semaphore
 import eventlet.hubs.hub
 import heapq
 import socket
-import trollius
 try:
     # Python 2
     import Queue as queue
@@ -25,7 +36,7 @@ def _is_main_thread():
     return isinstance(threading.current_thread(), threading._MainThread)
 
 
-class EventLoopPolicy(trollius.AbstractEventLoopPolicy):
+class EventLoopPolicy(asyncio.AbstractEventLoopPolicy):
     def __init__(self):
         self._loop = None
 
@@ -219,7 +230,7 @@ class EventLoop(BaseEventLoop):
     def _run_once(self):
         assert self.is_running()
 
-        # FIXME: copy optimization from trollius to remove cancelled timers
+        # FIXME: copy optimization from asyncio to remove cancelled timers
 
         # Handle 'later' callbacks that are ready.
         end_time = self.time() + self._clock_resolution
@@ -257,17 +268,17 @@ class EventLoop(BaseEventLoop):
             self._scheduler.schedule_timer(handle._when)
 
     def call_soon(self, callback, *args):
-        handle = trollius.Handle(callback, args, self)
+        handle = asyncio.Handle(callback, args, self)
         self._call_soon_handle(handle)
         return handle
 
     def call_soon_threadsafe(self, callback, *args):
-        handle = trollius.Handle(callback, args, self)
+        handle = asyncio.Handle(callback, args, self)
         self._thread_queue.put(handle)
         return handle
 
     def call_at(self, when, callback, *args):
-        timer = trollius.TimerHandle(when, callback, args, self)
+        timer = asyncio.TimerHandle(when, callback, args, self)
         heapq.heappush(self._scheduled, timer)
         self._scheduler.schedule_timer(when)
         return timer
@@ -317,8 +328,8 @@ class EventLoop(BaseEventLoop):
         # fix Trollius to call self.stop?
         self._check_closed()
 
-        new_task = not isinstance(future, futures._FUTURE_CLASSES)
-        future = trollius.async(future, loop=self)
+        new_task = not isinstance(future, _FUTURE_CLASSES)
+        future = asyncio.async(future, loop=self)
         if new_task:
             # An exception is raised if the future didn't complete, so there
             # is no need to log the "destroy pending task" message
