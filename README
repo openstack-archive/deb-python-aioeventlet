@@ -4,14 +4,14 @@ See also the Trollius project:
 http://trollius.readthedocs.org/
 
 Status
-------
+======
 
 The version 0.1 is the first public release. It was not tested on any project
 yet.
 
 
 Installation
-------------
+============
 
 Requirements:
 
@@ -31,8 +31,17 @@ or::
     python setup.py install
 
 
+Changelog
+=========
+
+2014-11-19: version 0.1
+-----------------------
+
+* First public release
+
+
 Implemented
------------
+===========
 
 Methods:
 
@@ -55,7 +64,7 @@ Tests of aiogreen 0.1:
 
 
 Not supported (yet)
--------------------
+===================
 
 * run an event loop in a thread different than the main thread
 * sockets: create_server, sock_recv
@@ -65,7 +74,7 @@ Not supported (yet)
 
 
 To do
------
+=====
 
 * Write new unit tests, or split Tulip test suite between implementation tests
   and specification tests
