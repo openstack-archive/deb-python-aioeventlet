@@ -85,47 +85,49 @@ class SocketTransport(selector_events._SelectorSocketTransport):
         return '<%s fd=%s>' % (self.__class__.__name__, self._sock_fd)
 
 
+def noop(*args, **kw):
+    pass
+
+
 class _Scheduler(object):
-    """Schedule a call to loop._run_once()."""
+    """Schedule a call to loop._run_once().
+
+    - schedule() calls loop._run_once() as soon as possible.
+      If schedule_at() was called, replace this previous scheduled call.
+    - schedule_at(when) calls it at the requested timestamp.
+      If schedule() was called, do nothing.
+    - stop() cancels the scheduled call.
+
+    The scheduler is protected by an eventlet semaphore."""
 
     def __init__(self, loop):
         self._loop = loop
-        self._scheduled = False
+        self._scheduled = None
         self._timer = None
         self._lock = eventlet.semaphore.Semaphore()
-
-    def _run_once_soon(self):
-        with self._lock:
-            if not self._scheduled:
-                # scheduler stop() method was called,
-                # the event loop is no more running
-                assert not self._loop.is_running()
-                return
-
-            self._unschedule_timer_unlocked()
-
-        self._loop._run_once()
 
     def schedule(self):
         with self._lock:
             self._schedule_unlocked()
 
     def _schedule_unlocked(self):
-        if self._scheduled:
+        if self._scheduled is not None:
             return
-        self._scheduled = True
         self._unschedule_timer_unlocked()
-        # spawn_n() doesn't call _run_once_soon() immediatly
-        eventlet.spawn_n(self._run_once_soon)
-        # FIXME: unschedule the greenthread if the loop is interrupted or something like that?
+        # spawn_n() doesn't call _run_once() immediatly
+        self._scheduled = eventlet.spawn_n(self._loop._run_once)
 
     def _unschedule_unlocked(self):
-        self._scheduled = False
-        # FIXME: optimize: cancel greenthread scheduled by _schedule()
+        if (self._scheduled is not None
+        # don't need to cancel the greenthread if it is running
+        and not self._scheduled):
+            # cancel the greenthread: replace its run method
+            self._scheduled.run = noop
+        self._scheduled = None
 
     def schedule_timer(self, when):
         with self._lock:
-            if self._scheduled:
+            if self._scheduled is not None:
                 return
 
             delay = when - self._loop.time()
