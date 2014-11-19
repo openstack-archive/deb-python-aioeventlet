@@ -17,13 +17,23 @@ try:
     from asyncio import selectors
     from asyncio.base_events import BaseEventLoop
     from asyncio.base_events import _check_resolved_address
+
+    _FUTURE_CLASSES = (asyncio.Future,)
+
+    if eventlet.patcher.is_monkey_patched('socket'):
+        # asyncio must use call original functions socket.socket()
+        # and socket.socketpair()
+        asyncio.base_events.socket = socket
+        if sys.platform == 'win32':
+            asyncio.windows_events.socket = socket
+            asyncio.windows_utils.socket = socket
+        else:
+            asyncio.unix_events.socket = socket
+
     if sys.platform == 'win32':
-        # FIXME: does it work with eventlet monkey-patching?
         from asyncio.windows_utils import socketpair
     else:
         socketpair = socket.socketpair
-
-    _FUTURE_CLASSES = (asyncio.Future,)
 except ImportError:
     import trollius as asyncio
     from trollius import selector_events
@@ -37,8 +47,19 @@ except ImportError:
     else:
         # Trollius >= 1.0.1
         _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
+
+    if eventlet.patcher.is_monkey_patched('socket'):
+        # trollius must use call original functions socket.socket()
+        # and socket.socketpair()
+        asyncio.base_events.socket = socket
+        if sys.platform == 'win32':
+            asyncio.windows_events.socket = socket
+            asyncio.windows_utils.socket = socket
+        else:
+            asyncio.unix_events.socket = socket
+        # FIXME: patch also trollius.py3_ssl
+
     if sys.platform == 'win32':
-        # FIXME: does it work with eventlet monkey-patching?
         from trollius.windows_utils import socketpair
     else:
         socketpair = socket.socketpair

@@ -31,9 +31,10 @@ Changelog
 Version 0.2 (development version)
 ---------------------------------
 
-* Add a suite of automated unit tests
-* Support eventlet 0.14
+* Support also eventlet 0.14, not only eventlet 0.15
+* Support eventlet with monkey-patching
 * sock_connect() is now asynchronous
+* Add a suite of automated unit tests
 
 2014-11-19: version 0.1
 -----------------------
@@ -77,6 +78,5 @@ Not supported (yet)
 To do
 =====
 
-* Support eventlet with monkey-patching
 * Glue to ease debug: keep traceback between Handle, coroutine and greenthread.
   Is it even possible?
