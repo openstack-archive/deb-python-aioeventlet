@@ -1,6 +1,5 @@
 try:
     import asyncio
-    from asyncio import futures
     from asyncio import selector_events
     from asyncio import selectors
     from asyncio.base_events import BaseEventLoop
@@ -8,12 +7,11 @@ try:
     _FUTURE_CLASSES = (asyncio.Future,)
 except ImportError:
     import trollius as asyncio
-    from trollius import futures
     from trollius import selector_events
     from trollius import selectors
     from trollius.base_events import BaseEventLoop
 
-    _FUTURE_CLASSES = futures._FUTURE_CLASSES
+    _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
 import errno
 import eventlet.greenio
 import eventlet.semaphore
