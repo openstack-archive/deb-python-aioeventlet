@@ -1,0 +1,31 @@
+import aiogreen
+import trollius
+import logging; logging.basicConfig(level=logging.DEBUG)
+
+class EchoClientProtocol(trollius.Protocol):
+    def __init__(self, message, loop):
+        self.message = message
+        self.loop = loop
+
+    def connection_made(self, transport):
+        transport.write(self.message.encode())
+        print('Data sent: {!r}'.format(self.message))
+
+    def data_received(self, data):
+        print('Data received: {!r}'.format(data.decode()))
+
+    def connection_lost(self, exc):
+        print('The server closed the connection')
+        print('Stop the event lop')
+        self.loop.stop()
+
+loop = aiogreen.EventLoop()
+message = 'Hello World!'
+coro = loop.create_connection(lambda: EchoClientProtocol(message, loop),
+                              '127.0.0.1', 8888)
+loop.run_until_complete(coro)
+
+loop.run_forever()
+loop.close()
+
+
