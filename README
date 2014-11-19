@@ -31,7 +31,7 @@ Changelog
 Version 0.2 (development version)
 ---------------------------------
 
-* Support also eventlet 0.14, not only eventlet 0.15
+* Support also eventlet 0.14, not only eventlet 0.15 or newer
 * Support eventlet with monkey-patching
 * sock_connect() is now asynchronous
 * Add a suite of automated unit tests
@@ -73,10 +73,3 @@ Not supported (yet)
 * pipes: connect_read_pipe
 * subprocesses: need pipes
 * signal handlers: add_signal_handler (only for pyevent hub?)
-
-
-To do
-=====
-
-* Glue to ease debug: keep traceback between Handle, coroutine and greenthread.
-  Is it even possible?
