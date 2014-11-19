@@ -81,8 +81,9 @@ class _ThreadQueue:
     def __init__(self, loop):
         self._loop = loop
         self._queue = queue.Queue()
-        self._ssock = None
-        self._csock = None
+        self._ssock, self._csock = socketpair()
+        self._ssock.setblocking(False)
+        self._csock.setblocking(False)
 
     def _consume(self):
         # schedule callbacks queued by put()
@@ -103,23 +104,19 @@ class _ThreadQueue:
                 break
 
     def start(self):
-        assert self._ssock is None
-        self._ssock, self._csock = socketpair()
-        self._ssock.setblocking(False)
-        self._csock.setblocking(False)
         self._loop.add_reader(self._ssock.fileno(), self._consume)
 
     def put(self, handle):
         self._queue.put(handle)
-        # use a local variable to be greenthread-safe
-        csock = self._csock
-        if csock is not None:
-            csock.send(b'\0')
+        self._csock.send(b'\0')
 
     def stop(self):
+        self._loop.remove_reader(self._ssock.fileno())
+
+    def close(self):
+        self.stop()
         if self._ssock is None:
             return
-        self._loop.remove_reader(self._ssock.fileno())
         self._ssock.close()
         self._ssock = None
         self._csock.close()
@@ -367,6 +364,7 @@ class EventLoop(BaseEventLoop):
 
     def close(self):
         super(EventLoop, self).close()
+        self._thread_queue.close()
 
     # FIXME: don't copy/paste asyncio code, but fix asyncio to call self.stop?
     def run_until_complete(self, future):
