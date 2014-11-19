@@ -23,6 +23,17 @@ except ImportError:
     # We won't be able to build the Wheel file on Windows.
     from distutils.core import setup, Extension
 
+requirements = ['eventlet']
+if sys.version_info >= (3, 4):
+    # Python 3.4 and newer: asyncio is now part of the stdlib
+    pass
+elif (3, 3) <= sys.version_info < (3, 4):
+    # Python 3.3: use Tulip
+    requirements.append('asyncio>=0.4.1')
+else:
+    # Python 2.6-3.2: use Trollius
+    requirements.append('trollius>=1.0')
+
 with open("README") as fp:
     long_description = fp.read()
 
@@ -47,6 +58,6 @@ install_options = {
     #"test_suite": "runtests.runtests",
 }
 if SETUPTOOLS:
-    install_options['install_requires'] = ['eventlet', 'trollius>=1.0']
+    install_options['install_requires'] = requirements
 
 setup(**install_options)
