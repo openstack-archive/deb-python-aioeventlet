@@ -4,6 +4,7 @@ try:
     from asyncio import selector_events
     from asyncio import selectors
     from asyncio.base_events import BaseEventLoop
+    from asyncio.base_events import _check_resolved_address
     if sys.platform == 'win32':
         from asyncio.windows_utils import socketpair
     else:
@@ -15,6 +16,7 @@ except ImportError:
     from trollius import selector_events
     from trollius import selectors
     from trollius.base_events import BaseEventLoop
+    from trollius.base_events import _check_resolved_address
 
     if hasattr(asyncio.tasks, '_FUTURE_CLASSES'):
         # Trollius 1.0.0
@@ -30,6 +32,7 @@ import errno
 import eventlet.greenio
 import eventlet.semaphore
 import eventlet.hubs.hub
+import functools
 import heapq
 import socket
 try:
@@ -49,6 +52,14 @@ _EVENTLET15 = hasattr(eventlet.hubs.hub.noop, 'mark_as_closed')
 # tulip >= 3.4.2 and trollius >= 1.0.2 implement an optimization
 # for cancelled timer handles
 _OPTIMIZE_CANCELLED_TIMERS = hasattr(asyncio.TimerHandle, '_scheduled')
+
+# Error numbers catched by Python 3.3 BlockingIOError exception
+_BLOCKING_IO_ERRNOS = set((
+    errno.EAGAIN,
+    errno.EALREADY,
+    errno.EINPROGRESS,
+    errno.EWOULDBLOCK,
+))
 
 
 def _is_main_thread():
@@ -427,24 +438,83 @@ class EventLoop(BaseEventLoop):
     def remove_writer(self, fd):
         return self._remove_fd(_WRITE, fd)
 
+    # ----
+    # FIXME: reuse SelectorEventLoop.sock_connect() code instead of
+    # copy/paste the code. Code adapted to work on Python 2 and Python 3,
+    # and work on asyncio and trollius
     def sock_connect(self, sock, address):
-        # code adapted from GreenSocket.connect(),
-        # the version without timeout
+        """Connect to a remote socket at address.
+
+        The address must be already resolved to avoid the trap of hanging the
+        entire event loop when the address requires doing a DNS lookup. For
+        example, it must be an IP address, not an hostname, for AF_INET and
+        AF_INET6 address families. Use getaddrinfo() to resolve the hostname
+        asynchronously.
+
+        This method is a coroutine.
+        """
+        if self.get_debug() and sock.gettimeout() != 0:
+            raise ValueError("the socket must be non-blocking")
         fut = asyncio.Future(loop=self)
         try:
-            fd = sock.fileno()
-            while not eventlet.greenio.socket_connect(sock, address):
-                # FIXME: write asynchronous code
+            _check_resolved_address(sock, address)
+        except ValueError as err:
+            fut.set_exception(err)
+        else:
+            self._sock_connect(fut, sock, address)
+        return fut
+
+    def _sock_connect(self, fut, sock, address):
+        fd = sock.fileno()
+        try:
+            while True:
                 try:
-                    eventlet.hubs.trampoline(fd, write=True)
-                except eventlet.hubs.IOClosed:
-                    raise socket.error(errno.EBADFD)
-                eventlet.greenio.socket_checkerr(sock)
+                    sock.connect(address)
+                except OSError as exc:
+                    if exc.errno == errno.EINTR:
+                        continue
+                    else:
+                        raise
+                else:
+                    break
+        except socket.error as exc:
+            if exc.errno in _BLOCKING_IO_ERRNOS:
+                cb = functools.partial(self._sock_connect_done, sock)
+                fut.add_done_callback(cb)
+                self.add_writer(fd, self._sock_connect_cb, fut, sock, address)
+            else:
+                raise
         except Exception as exc:
             fut.set_exception(exc)
         else:
             fut.set_result(None)
-        return fut
+
+    def _sock_connect_done(self, sock, fut):
+        self.remove_writer(sock.fileno())
+
+    def _sock_connect_cb(self, fut, sock, address):
+        if fut.cancelled():
+            return
+
+        try:
+            err = sock.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
+            if err != 0:
+                # Jump to the except clause below.
+                raise OSError(err, 'Connect call failed %s' % (address,))
+        except socket.error as exc:
+            if exc.errno in _BLOCKING_IO_ERRNOS or exc.errno == errno.EINTR:
+                # socket is still registered, the callback will
+                # be retried later
+                pass
+            else:
+                raise
+        except Exception as exc:
+            fut.set_exception(exc)
+        else:
+            fut.set_result(None)
+    # FIXME: reuse SelectorEventLoop.sock_connect() code instead of
+    # copy/paste the code
+    # ----
 
     def _make_socket_transport(self, sock, protocol, waiter=None,
                                extra=None, server=None):
