@@ -3,11 +3,13 @@ import aiogreen
 try:
     import asyncio
 
-    def work():
-        print("Hello")
-        # retrieve the event loop from the policy
-        yield from asyncio.sleep(1)
-        print('World')
+    exec('''if 1:
+        def work():
+            print("Hello")
+            # retrieve the event loop from the policy
+            yield from asyncio.sleep(1)
+            print('World')
+    ''')
 except ImportError:
     import trollius as asyncio
     from trollius import From
