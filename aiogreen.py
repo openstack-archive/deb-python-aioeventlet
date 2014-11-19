@@ -171,11 +171,9 @@ class _Scheduler(object):
     def _unschedule_unlocked(self):
         if (self._greenthread is not None
         # If the greenthread is running, there is not need to cancel it.
-        # Only cancel the greenthread if it didn't start or if it already
-        # finished (which should not occur, but it doesn't hurt to cancel it
-        # in this case).
-        and not self._greenthread):
-            # cancel the greenthread: replace its run method
+        # Only cancel the greenthread if it didn't start yet.
+        and not self._greenthread
+        and not self._greenthread.dead):
             self._greenthread.run = noop
         self._greenthread = None
 
