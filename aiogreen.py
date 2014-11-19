@@ -425,13 +425,21 @@ class EventLoop(BaseEventLoop):
     def sock_connect(self, sock, address):
         # code adapted from GreenSocket.connect(),
         # the version without timeout
-        fd = sock.fileno()
-        while not eventlet.greenio.socket_connect(sock, address):
-            try:
-                eventlet.hubs.trampoline(fd, write=True)
-            except eventlet.hubs.IOClosed:
-                raise socket.error(errno.EBADFD)
-            eventlet.greenio.socket_checkerr(sock)
+        fut = asyncio.Future(loop=self)
+        try:
+            fd = sock.fileno()
+            while not eventlet.greenio.socket_connect(sock, address):
+                # FIXME: write asynchronous code
+                try:
+                    eventlet.hubs.trampoline(fd, write=True)
+                except eventlet.hubs.IOClosed:
+                    raise socket.error(errno.EBADFD)
+                eventlet.greenio.socket_checkerr(sock)
+        except Exception as exc:
+            fut.set_exception(exc)
+        else:
+            fut.set_result(None)
+        return fut
 
     def _make_socket_transport(self, sock, protocol, waiter=None,
                                extra=None, server=None):
