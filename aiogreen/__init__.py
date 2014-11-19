@@ -85,7 +85,7 @@ class SocketTransport(selector_events._SelectorSocketTransport):
         return '<%s fd=%s>' % (self.__class__.__name__, self._sock_fd)
 
 
-class _Scheduler:
+class _Scheduler(object):
     """Schedule a call to loop._run_once()."""
 
     def __init__(self, loop):
@@ -97,7 +97,8 @@ class _Scheduler:
     def _run_once_soon(self):
         with self._lock:
             if not self._scheduled:
-                # stop() was called, the event loop is no more running
+                # scheduler stop() method was called,
+                # the event loop is no more running
                 assert not self._loop.is_running()
                 return
 
@@ -114,8 +115,8 @@ class _Scheduler:
             return
         self._scheduled = True
         self._unschedule_timer_unlocked()
-        # FIXME: deadlock if _run_once_soon is called immediatly?
-        self._loop._pool.spawn(self._run_once_soon)
+        # spawn_n() doesn't call _run_once_soon() immediatly
+        eventlet.spawn_n(self._run_once_soon)
         # FIXME: unschedule the greenthread if the loop is interrupted or something like that?
 
     def _unschedule_unlocked(self):
@@ -142,7 +143,7 @@ class _Scheduler:
 
             hub = self._loop._hub
             greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
-            # FIXME: deadlock if _run_once() is called immediatly?
+            # schedule_call_global() doesn't call the function immediatly
             greentimer = hub.schedule_call_global(delay,
                                                   greenthread.switch,
                                                   self._loop._run_once, (), {})
@@ -167,7 +168,6 @@ class EventLoop(BaseEventLoop):
         # Store a reference to the hub to ensure
         # that we always use the same hub
         self._hub = eventlet.hubs.get_hub()
-        self._pool = eventlet.GreenPool()
         # Queue used by call_soon_threadsafe()
         self._thread_queue = ThreadQueue(self)
         self._stop_event = None
@@ -191,9 +191,7 @@ class EventLoop(BaseEventLoop):
         return (self._stop_event is not None)
 
     def _run_once(self):
-        run = self._stop_event
-        # if run is None, the event loop is not running
-        assert run is not None
+        assert self.is_running()
 
         # FIXME: copy optimization from trollius to remove cancelled timers
 
@@ -209,9 +207,13 @@ class EventLoop(BaseEventLoop):
                 continue
             self._ready.append(handle)
 
+        # use a local copy because stop() clears the attribute
+        stop_event = self._stop_event
+
         ntodo = len(self._ready)
         for i in range(ntodo):
-            if run.ready():
+            if stop_event.ready():
+                # stop() was called
                 break
             handle = self._ready.popleft()
             if handle._cancelled:
@@ -273,8 +275,8 @@ class EventLoop(BaseEventLoop):
         try:
             self._stop_event = eventlet.event.Event()
             # use a local copy because stop() clears the attribute
-            run = self._stop_event
-            run.wait()
+            stop_event = self._stop_event
+            stop_event.wait()
         finally:
             self._stop_event = None
             self._scheduler.stop()
