@@ -54,39 +54,58 @@ class EventLoopPolicy(asyncio.AbstractEventLoopPolicy):
         self._loop = loop
 
 
-# FIXME: is there a more efficient way to exchange data between two threads?
 class _ThreadQueue:
-    """Queue to schedule handles """
+    """Queue used by EventLoop.call_soon_threadsafe().
+
+    Store handles in a queue and schedule them in the thread of the event
+    loop as soon as possible.
+    """
     def __init__(self, loop):
         self._loop = loop
         self._queue = queue.Queue()
-        self._greenthread = None
-
-    def start(self):
-        self._greenthread = eventlet.spawn(self._consume)
+        self._ssock = None
+        self._csock = None
 
     def _consume(self):
+        # schedule callbacks queued by put()
         while True:
             try:
-                # FIXME: don't use polling
-                stop, handle = self._queue.get(timeout=0.01)
+                handle = self._queue.get(block=False)
             except eventlet.queue.Empty:
-                eventlet.sleep(0)
-                continue
-
-            if stop:
                 break
             self._loop._call_soon_handle(handle)
 
+        # flush data of the self-pipe
+        while True:
+            try:
+                data = self._ssock.recv(4096)
+                if not data:
+                    break
+            except socket.error:
+                break
+
+    def start(self):
+        assert self._ssock is None
+        self._ssock, self._csock = socket.socketpair()
+        self._ssock.setblocking(False)
+        self._csock.setblocking(False)
+        self._loop.add_reader(self._ssock.fileno(), self._consume)
+
     def put(self, handle):
-        self._queue.put((False, handle))
+        self._queue.put(handle)
+        # use a local variable to be greenthread-safe
+        csock = self._csock
+        if csock is not None:
+            csock.send(b'\0')
 
     def stop(self):
-        if self._greenthread is None:
+        if self._ssock is None:
             return
-        self._queue.put((True, None))
-        self._greenthread.wait()
-        self._greenthread = None
+        self._loop.remove_reader(self._ssock.fileno())
+        self._ssock.close()
+        self._ssock = None
+        self._csock.close()
+        self._csock = None
 
 
 class SocketTransport(selector_events._SelectorSocketTransport):
@@ -109,7 +128,8 @@ class _Scheduler(object):
       If schedule() was called, do nothing.
     - stop() cancels the scheduled call.
 
-    The scheduler is protected by an eventlet semaphore."""
+    The scheduler is protected by an eventlet semaphore.
+    """
 
     def __init__(self, loop):
         self._loop = loop
@@ -248,7 +268,7 @@ class EventLoop(BaseEventLoop):
         ntodo = len(self._ready)
         for i in range(ntodo):
             if stop_event.ready():
-                # stop() was called
+                # stop() has been called
                 break
             handle = self._ready.popleft()
             if handle._cancelled:
