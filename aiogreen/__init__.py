@@ -102,7 +102,7 @@ class _Scheduler(object):
 
     def __init__(self, loop):
         self._loop = loop
-        self._scheduled = None
+        self._greenthread = None
         self._timer = None
         self._lock = eventlet.semaphore.Semaphore()
 
@@ -111,23 +111,31 @@ class _Scheduler(object):
             self._schedule_unlocked()
 
     def _schedule_unlocked(self):
-        if self._scheduled is not None:
+        if self._greenthread is not None:
+            # already scheduled
             return
+
+        # the greenthread will be called before the next timer,
+        # cancel the timer
         self._unschedule_timer_unlocked()
-        # spawn_n() doesn't call _run_once() immediatly
-        self._scheduled = eventlet.spawn_n(self._loop._run_once)
+
+        # it's safe to call spawn_n() with the lock:
+        # it doesn't call _run_once() immediatly
+        self._greenthread = eventlet.spawn_n(self._loop._run_once)
 
     def _unschedule_unlocked(self):
-        if (self._scheduled is not None
-        # don't need to cancel the greenthread if it is running
-        and not self._scheduled):
+        if (self._greenthread is not None
+        # If the greenthread is running, there is not need to cancel it.
+        # Only cancel the greenthread if it didn't start or if it already
+        # finished (which should not occur, but it doesn't hurt to cancel it).
+        and not self._greenthread):
             # cancel the greenthread: replace its run method
-            self._scheduled.run = noop
-        self._scheduled = None
+            self._greenthread.run = noop
+        self._greenthread = None
 
     def schedule_timer(self, when):
         with self._lock:
-            if self._scheduled is not None:
+            if self._greenthread is not None:
                 return
 
             delay = when - self._loop.time()
@@ -137,9 +145,11 @@ class _Scheduler(object):
 
             if self._timer is not None:
                 if self._timer[0] <= when:
-                    # a timer will ring earlier
+                    # the existing timer will be triggered earlier,
+                    # nothing to do
                     return
-                # a timer was scheduled later
+
+                # the existing timer was scheduled later, replace it
                 self._timer[1].cancel()
                 self._timer = None
 
@@ -154,6 +164,7 @@ class _Scheduler(object):
     def _unschedule_timer_unlocked(self):
         if self._timer is None:
             return
+
         when, greentimer = self._timer
         self._timer = None
         greentimer.cancel()
