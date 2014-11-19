@@ -21,6 +21,8 @@ Not supported:
 
 Todo:
 
+* Write new unit tests, or split Tulip test suite between implementation tests
+  and specification tests
 * Support eventlet without monkey-patching
 * Test with Python 2 and 3
 * Test with Trollius and asyncio
