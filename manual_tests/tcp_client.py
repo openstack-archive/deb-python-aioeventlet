@@ -1,8 +1,11 @@
+#import logging; logging.basicConfig(level=logging.DEBUG)
 import aiogreen
-import trollius
-import logging; logging.basicConfig(level=logging.DEBUG)
+try:
+    import asyncio
+except ImportError:
+    import trollius as asyncio
 
-class EchoClientProtocol(trollius.Protocol):
+class EchoClientProtocol(asyncio.Protocol):
     def __init__(self, message, loop):
         self.message = message
         self.loop = loop
@@ -16,7 +19,7 @@ class EchoClientProtocol(trollius.Protocol):
 
     def connection_lost(self, exc):
         print('The server closed the connection')
-        print('Stop the event lop')
+        print('Stop the event loop')
         self.loop.stop()
 
 loop = aiogreen.EventLoop()
