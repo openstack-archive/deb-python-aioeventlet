@@ -40,7 +40,7 @@ class EventLoopPolicy(asyncio.AbstractEventLoopPolicy):
 
     def get_event_loop(self):
         if not _is_main_thread():
-            raise NotImplementedError("currently aiogreen can only run in the main thread")
+            return None
         if self._loop is None:
             self._loop = EventLoop()
         return self._loop
@@ -49,8 +49,8 @@ class EventLoopPolicy(asyncio.AbstractEventLoopPolicy):
         return EventLoop()
 
     def set_event_loop(self, loop):
-        if self._loop is not None:
-            raise NotImplementedError("cannot run two event loops in the same thread")
+        if not _is_main_thread():
+            raise NotImplementedError("aiogreen can only run in the main thread")
         self._loop = loop
 
 
