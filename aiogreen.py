@@ -11,7 +11,12 @@ except ImportError:
     from trollius import selectors
     from trollius.base_events import BaseEventLoop
 
-    _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
+    if hasattr(asyncio.tasks, '_FUTURE_CLASSES'):
+        # Trollius 1.0.0
+        _FUTURE_CLASSES = asyncio.tasks._FUTURE_CLASSES
+    else:
+        # Trollius 1.0.1 and newer
+        _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
 import errno
 import eventlet.greenio
 import eventlet.semaphore
