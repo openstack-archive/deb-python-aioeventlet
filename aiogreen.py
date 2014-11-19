@@ -20,7 +20,7 @@ except ImportError:
         # Trollius 1.0.0
         _FUTURE_CLASSES = asyncio.tasks._FUTURE_CLASSES
     else:
-        # Trollius 1.0.1 and newer
+        # Trollius >= 1.0.1
         _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
     if sys.platform == 'win32':
         from trollius.windows_utils import socketpair
@@ -43,8 +43,8 @@ threading = eventlet.patcher.original('threading')
 _READ = eventlet.hubs.hub.READ
 _WRITE = eventlet.hubs.hub.WRITE
 
-# tulip 3.4.2 and newer and trollius 1.0.2 and newer implements an
-# optimization for cancelled timer handles
+# tulip >= 3.4.2 and trollius >= 1.0.2 implement an optimization
+# for cancelled timer handles
 _OPTIMIZE_CANCELLED_TIMERS = hasattr(asyncio.TimerHandle, '_scheduled')
 
 
@@ -368,10 +368,11 @@ class EventLoop(BaseEventLoop):
     def close(self):
         super(EventLoop, self).close()
 
+    # FIXME: don't copy/paste asyncio code, but fix asyncio to call self.stop?
     def run_until_complete(self, future):
-        # FIXME: don't copy/paste Trollius code, but
-        # fix Trollius to call self.stop?
-        self._check_closed()
+        # only available since tulip >= 3.4.2 and trollius >= 0.4
+        if hasattr(self, '_check_closed'):
+            self._check_closed()
 
         new_task = not isinstance(future, _FUTURE_CLASSES)
         future = asyncio.async(future, loop=self)
