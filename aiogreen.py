@@ -43,6 +43,9 @@ threading = eventlet.patcher.original('threading')
 _READ = eventlet.hubs.hub.READ
 _WRITE = eventlet.hubs.hub.WRITE
 
+# Eventlet 0.15 or newer?
+_EVENTLET15 = hasattr(eventlet.hubs.hub.noop, 'mark_as_closed')
+
 # tulip >= 3.4.2 and trollius >= 1.0.2 implement an optimization
 # for cancelled timer handles
 _OPTIMIZE_CANCELLED_TIMERS = hasattr(asyncio.TimerHandle, '_scheduled')
@@ -398,7 +401,10 @@ class EventLoop(BaseEventLoop):
         fd = selectors._fileobj_to_fd(fd)
         def func(fd):
             return callback(*args)
-        self._hub.add(event_type, fd, func, self._throwback, None)
+        if _EVENTLET15:
+            self._hub.add(event_type, fd, func, self._throwback, None)
+        else:
+            self._hub.add(event_type, fd, func)
 
     def add_reader(self, fd, callback, *args):
         self._add_fd(_READ, fd, callback, args)

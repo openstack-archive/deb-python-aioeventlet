@@ -16,7 +16,7 @@ Installation
 
 Requirements:
 
-- eventlet (it was tested with eventlet 0.15)
+- eventlet 0.14 or newer
 - asyncio or trollius:
 
   * Python 3.4 and newer: asyncio is now part of the stdlib
