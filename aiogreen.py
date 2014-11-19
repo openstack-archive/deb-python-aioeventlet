@@ -256,7 +256,7 @@ class _TpoolExecutor(object):
         return f
 
     def shutdown(self, wait=True):
-        pass
+        self._tpool.killall()
 
 
 class EventLoop(BaseEventLoop):
