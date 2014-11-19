@@ -43,6 +43,10 @@ threading = eventlet.patcher.original('threading')
 _READ = eventlet.hubs.hub.READ
 _WRITE = eventlet.hubs.hub.WRITE
 
+# tulip 3.4.2 and newer and trollius 1.0.2 and newer implements an
+# optimization for cancelled timer handles
+_OPTIMIZE_CANCELLED_TIMERS = hasattr(asyncio.TimerHandle, '_scheduled')
+
 
 def _is_main_thread():
     return isinstance(threading.current_thread(), threading._MainThread)
@@ -260,7 +264,9 @@ class EventLoop(BaseEventLoop):
     def _run_once(self):
         assert self.is_running()
 
-        # FIXME: copy optimization from asyncio to remove cancelled timers
+        if _OPTIMIZE_CANCELLED_TIMERS:
+            # FIXME: copy optimization from asyncio to remove cancelled timers
+            pass
 
         # Handle 'later' callbacks that are ready.
         end_time = self.time() + self._clock_resolution
@@ -269,7 +275,8 @@ class EventLoop(BaseEventLoop):
             if handle._when >= end_time:
                 break
             handle = heapq.heappop(self._scheduled)
-            handle._scheduled = False
+            if _OPTIMIZE_CANCELLED_TIMERS:
+                handle._scheduled = False
             if handle._cancelled:
                 continue
             self._ready.append(handle)
@@ -348,7 +355,6 @@ class EventLoop(BaseEventLoop):
             stop_event.wait()
         finally:
             self._stop_event = None
-            self._scheduler.stop()
             # Stop the greenthread of the thread queue.
             # call_soon_threadsafe() can still be called, handles will be
             # stored in the thread queue.
