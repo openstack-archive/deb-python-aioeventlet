@@ -1,7 +1,6 @@
 from trollius import futures
 from trollius import selector_events
 from trollius import selectors
-from trollius import tasks
 from trollius.base_events import BaseEventLoop
 import errno
 import eventlet.greenio
@@ -321,7 +320,7 @@ class EventLoop(BaseEventLoop):
         self._check_closed()
 
         new_task = not isinstance(future, futures._FUTURE_CLASSES)
-        future = tasks.async(future, loop=self)
+        future = trollius.async(future, loop=self)
         if new_task:
             # An exception is raised if the future didn't complete, so there
             # is no need to log the "destroy pending task" message
