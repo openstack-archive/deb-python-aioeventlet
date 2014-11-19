@@ -1,6 +1,34 @@
 asyncio event loop scheduling callbacks in eventlet.
 
-Implemented:
+See also the Trollius project:
+http://trollius.readthedocs.org/
+
+Status
+------
+
+The version 0.1 is the first public release. It was not tested on any project
+yet.
+
+
+Installation
+------------
+
+Requirements:
+
+- eventlet (it was tested with eventlet 0.15)
+- trollius 1.0 or newer
+
+Type::
+
+    pip install aiogreen
+
+or::
+
+    python setup.py install
+
+
+Implemented
+-----------
 
 * call_at()
 * call_later()
@@ -11,7 +39,9 @@ Implemented:
 * stop()
 * coroutines and tasks
 
-Not supported:
+
+Not supported (yet)
+-------------------
 
 * run an event loop in a thread different than the main thread
 * sockets: create_connection, create_server, sock_recv
@@ -19,14 +49,17 @@ Not supported:
 * subprocesses: need pipes
 * signal handlers: add_signal_handler (only for pyevent hub?)
 
-Todo:
+
+To do
+-----
 
 * Write new unit tests, or split Tulip test suite between implementation tests
   and specification tests
 * Support eventlet without monkey-patching
 * Test with Python 2 and 3
 * Test with Trollius and asyncio
-* Glue to ease debug: keep traceback between Handle, coroutine and greenthread
+* Glue to ease debug: keep traceback between Handle, coroutine and greenthread.
+  Is it even possible?
 * run_in_executor(): use eventlet.tpool as the default executor?
   It avoids the dependency to concurrent.futures. aiogreen is written as a
   temporary solution to switch from eventlet to asyncio. So it may be better to
