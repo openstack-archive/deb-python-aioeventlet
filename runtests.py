@@ -61,6 +61,9 @@ ARGS.add_option(
     '-c', '--catch', action="store_true", default=False,
     dest='catchbreak', help='Catch control-C and display results')
 ARGS.add_option(
+    '-m', '--monkey-patch', action="store_true", default=False,
+    dest='monkey_patch', help='Enable eventlet monkey patching')
+ARGS.add_option(
     '--forever', action="store_true", dest='forever', default=False,
     help='run tests forever to catch sporadic errors')
 ARGS.add_option(
@@ -255,6 +258,11 @@ def runtests():
     findleaks = args.findleaks
     runner_factory = TestRunner if findleaks else unittest.TextTestRunner
 
+    if args.monkey_patch:
+        print("Enable eventlet monkey patching of the Python standard library")
+        import eventlet
+        eventlet.monkey_patch()
+
     if args.coverage:
         cov = coverage.coverage(branch=True,
                                 source=['asyncio'],
@@ -287,6 +295,7 @@ def runtests():
         print("Run tests in debug mode")
     else:
         print("Run tests in release mode")
+    sys.stdout.flush()
     try:
         if args.forever:
             while True:
