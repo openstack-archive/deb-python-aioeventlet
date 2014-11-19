@@ -41,3 +41,8 @@ class TimerTests(tests.TestCase):
 
         self.loop.run_forever()
         self.assertEqual(result, ["Hello", "World"])
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()

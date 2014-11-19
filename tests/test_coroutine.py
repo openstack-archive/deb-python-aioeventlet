@@ -25,3 +25,8 @@ class CallbackTests(tests.TestCase):
         result = []
         self.loop.run_until_complete(hello_world(result, 0.001))
         self.assertEqual(result, ['Hello', 'World'])
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()
