@@ -121,7 +121,7 @@ class _Scheduler(object):
             return
 
         # the greenthread will be called before the next timer,
-        # cancel the timer
+        # cancel the timer if any
         self._unschedule_timer_unlocked()
 
         # it's safe to call spawn_n() with the lock:
@@ -132,7 +132,8 @@ class _Scheduler(object):
         if (self._greenthread is not None
         # If the greenthread is running, there is not need to cancel it.
         # Only cancel the greenthread if it didn't start or if it already
-        # finished (which should not occur, but it doesn't hurt to cancel it).
+        # finished (which should not occur, but it doesn't hurt to cancel it
+        # in this case).
         and not self._greenthread):
             # cancel the greenthread: replace its run method
             self._greenthread.run = noop
@@ -141,6 +142,7 @@ class _Scheduler(object):
     def schedule_timer(self, when):
         with self._lock:
             if self._greenthread is not None:
+                # already scheduled
                 return
 
             delay = when - self._loop.time()
@@ -160,7 +162,9 @@ class _Scheduler(object):
 
             hub = self._loop._hub
             greenthread = eventlet.greenthread.GreenThread(hub.greenlet)
-            # schedule_call_global() doesn't call the function immediatly
+            # it is safe to call schedule_call_global() with the lock:
+            # it does not switch to _run_once() immediatly (it creates a timer
+            # and adds it a the "next timers").
             greentimer = hub.schedule_call_global(delay,
                                                   greenthread.switch,
                                                   self._loop._run_once, (), {})
@@ -243,8 +247,6 @@ class EventLoop(BaseEventLoop):
             handle = self._ready.popleft()
             if handle._cancelled:
                 continue
-            # FIXME: what happens if this method is interrupted,
-            # and _schedule() is called?
             handle._run()
 
         self._scheduler.stop()
@@ -279,11 +281,8 @@ class EventLoop(BaseEventLoop):
 
     def _timer_handle_cancelled(self, handle):
         super(EventLoop, self)._timer_handle_cancelled(handle)
-        # FIXME: reschedule the _run_once() timer
-
-    # FIXME: run_in_executor(): use eventlet.tpool as the default executor?
-    # It avoids the dependency to concurrent.futures, but later it would be
-    # better to use concurrent.futures. So... What is the best?
+        # FIXME: optimization, reschedule _run_once() if the cancelled timer
+        # was the next timer
 
     def stop(self):
         if self._stop_event is None:
@@ -340,7 +339,7 @@ class EventLoop(BaseEventLoop):
         return future.result()
 
     def _throwback(self):
-        # FIXME: do something?
+        # FIXME: do something with the FD in this case?
         pass
 
     def _add_fd(self, event_type, fd, callback, args):

@@ -25,3 +25,7 @@ Todo:
 * Test with Python 2 and 3
 * Test with Trollius and asyncio
 * Glue to ease debug: keep traceback between Handle, coroutine and greenthread
+* run_in_executor(): use eventlet.tpool as the default executor?
+  It avoids the dependency to concurrent.futures. aiogreen is written as a
+  temporary solution to switch from eventlet to asyncio. So it may be better to
+  use directly concurrent.futures to reduce the usage of eventlet?
