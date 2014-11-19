@@ -355,6 +355,7 @@ class EventLoop(BaseEventLoop):
             stop_event.wait()
         finally:
             self._stop_event = None
+            self._scheduler.stop()
             # Stop the greenthread of the thread queue.
             # call_soon_threadsafe() can still be called, handles will be
             # stored in the thread queue.
