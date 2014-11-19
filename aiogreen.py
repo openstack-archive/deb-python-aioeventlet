@@ -237,6 +237,26 @@ class _Scheduler(object):
             self._unschedule_timer_unlocked()
 
 
+class _TpoolExecutor(object):
+    def __init__(self, loop):
+        import eventlet.tpool
+        self._loop = loop
+        self._tpool = eventlet.tpool
+
+    def submit(self, fn, *args, **kwargs):
+        f = asyncio.Future(loop=self._loop)
+        try:
+            res = self._tpool.execute(fn, *args, **kwargs)
+        except Exception as exc:
+            f.set_exception(exc)
+        else:
+            f.set_result(res)
+        return f
+
+    def shutdown(self, wait=True):
+        pass
+
+
 class EventLoop(BaseEventLoop):
     def __init__(self):
         super(EventLoop, self).__init__()
@@ -256,6 +276,9 @@ class EventLoop(BaseEventLoop):
 
         # Scheduler used to schedule a call to the loop._run_once() method
         self._scheduler = _Scheduler(self)
+
+        if eventlet.patcher.is_monkey_patched('thread'):
+            self._default_executor = _TpoolExecutor(self)
 
     def time(self):
         return self._hub.clock()
