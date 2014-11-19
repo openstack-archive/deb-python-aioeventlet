@@ -58,6 +58,7 @@ To do
 * Support eventlet without monkey-patching
 * Test with Python 2 and 3
 * Test with Trollius and asyncio
+* Port to Windows; test on operating systems other than Linux
 * Glue to ease debug: keep traceback between Handle, coroutine and greenthread.
   Is it even possible?
 * run_in_executor(): use eventlet.tpool as the default executor?
