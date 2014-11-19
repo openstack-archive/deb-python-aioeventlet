@@ -1,8 +1,5 @@
-import logging; logging.basicConfig(level=logging.DEBUG)
-import aiogreen, trollius; trollius.set_event_loop_policy(aiogreen.EventLoopPolicy())
-from trollius import From
-
-import trollius
+import aiogreen
+import eventlet
 import time
 
 def hello():
@@ -17,7 +14,7 @@ def world():
     print("stop")
     loop.stop()
 
-loop = trollius.get_event_loop()
+loop = aiogreen.EventLoop()
 loop.call_soon(hello)
 loop.call_soon(stop)
 loop.call_soon(world)
