@@ -119,17 +119,13 @@ def load_modules(basedir, suffix='.py'):
     for modname, sourcefile in list_dir('', basedir):
         if modname == 'runtests':
             continue
-        if modname == 'test_asyncio' and sys.version_info <= (3, 3):
-            print("Skipping '{0}': need at least Python 3.3".format(modname),
-                  file=sys.stderr)
-            continue
         try:
             mod = load_module(modname, sourcefile)
             mods.append((mod, sourcefile))
         except SyntaxError:
             raise
-        except Exception as err:
-            print("Skipping '{0}': {1}".format(modname, err), file=sys.stderr)
+        #except Exception as err:
+        #    print("Skipping '{0}': {1}".format(modname, err), file=sys.stderr)
 
     return mods
 
