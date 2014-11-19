@@ -354,8 +354,12 @@ class EventLoop(BaseEventLoop):
             # sleep until the stop() method is called
             stop_event.wait()
         finally:
-            self._stop_event = None
+            # First ensure that _run_once() will not be called
             self._scheduler.stop()
+
+            # The event loop stopped
+            self._stop_event = None
+
             # Stop the greenthread of the thread queue.
             # call_soon_threadsafe() can still be called, handles will be
             # stored in the thread queue.
