@@ -4,13 +4,6 @@ asyncio event loop scheduling callbacks in eventlet.
 * aiogreen at PyPI: https://pypi.python.org/pypi/aiogreen
 
 
-Status
-======
-
-The version 0.1 is the first public release. It was not tested on any project
-yet.
-
-
 Installation
 ============
 
