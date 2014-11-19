@@ -8,7 +8,6 @@ import eventlet.semaphore
 import eventlet.hubs.hub
 import heapq
 import socket
-import sys
 import trollius
 try:
     # Python 2
