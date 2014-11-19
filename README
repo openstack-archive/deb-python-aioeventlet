@@ -34,21 +34,31 @@ or::
 Implemented
 -----------
 
+Methods:
+
 * call_at()
 * call_later()
 * call_soon()
 * run_forever()
 * run_in_executor()
 * run_until_complete()
+* create_connection(): TCP client
 * stop()
 * coroutines and tasks
+
+Tests of aiogreen 0.1:
+
+* Tested on Python 2.7, 3.3 and 3.5
+* Tested on Linux and Windows
+* Tested with Trollius 1.0, 1.0.1 and 1.0.2
+* Tested with asyncio 0.4.1 and 3.4.2
 
 
 Not supported (yet)
 -------------------
 
 * run an event loop in a thread different than the main thread
-* sockets: create_connection, create_server, sock_recv
+* sockets: create_server, sock_recv
 * pipes: connect_read_pipe
 * subprocesses: need pipes
 * signal handlers: add_signal_handler (only for pyevent hub?)
