@@ -1,5 +1,5 @@
 import aiogreen
-from socket import socketpair
+from aiogreen import socketpair
 
 # Create a pair of connected file descriptors
 rsock, wsock = socketpair()
