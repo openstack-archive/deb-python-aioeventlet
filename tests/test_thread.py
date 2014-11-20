@@ -44,15 +44,18 @@ class ThreadTests(tests.TestCase):
         self.assertEqual(result, ["run", "run"])
 
     def test_policy(self):
-        result = {'loop': 42}   # sentinel, different than None
+        result = {'loop': 'not set'}   # sentinel, different than None
 
         def work():
-            result['loop'] = asyncio.get_event_loop()
+            try:
+                result['loop'] = asyncio.get_event_loop()
+            except AssertionError as exc:
+                result['loop'] = exc
 
         # get_event_loop() must return None in a different thread
         fut = self.loop.run_in_executor(None, work)
         self.loop.run_until_complete(fut)
-        self.assertIsNone(result['loop'])
+        self.assertIsInstance(result['loop'], AssertionError)
 
 
 if __name__ == '__main__':

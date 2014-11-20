@@ -6,6 +6,7 @@ import eventlet.hubs.hub
 import functools
 import heapq
 socket = eventlet.patcher.original('socket')
+threading = eventlet.patcher.original('threading')
 try:
     # Python 2
     import Queue as queue
@@ -19,16 +20,6 @@ try:
     from asyncio.log import logger
 
     _FUTURE_CLASSES = (asyncio.Future,)
-
-    if eventlet.patcher.is_monkey_patched('socket'):
-        # asyncio must use call original functions socket.socket()
-        # and socket.socketpair()
-        asyncio.base_events.socket = socket
-        if sys.platform == 'win32':
-            asyncio.windows_events.socket = socket
-            asyncio.windows_utils.socket = socket
-        else:
-            asyncio.unix_events.socket = socket
 
     if sys.platform == 'win32':
         from asyncio.windows_utils import socketpair
@@ -48,23 +39,24 @@ except ImportError:
         # Trollius >= 1.0.1
         _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
 
-    if eventlet.patcher.is_monkey_patched('socket'):
-        # trollius must use call original functions socket.socket()
-        # and socket.socketpair()
-        asyncio.base_events.socket = socket
-        if sys.platform == 'win32':
-            asyncio.windows_events.socket = socket
-            asyncio.windows_utils.socket = socket
-        else:
-            asyncio.unix_events.socket = socket
-        # FIXME: patch also trollius.py3_ssl
-
     if sys.platform == 'win32':
         from trollius.windows_utils import socketpair
     else:
         socketpair = socket.socketpair
 
-threading = eventlet.patcher.original('threading')
+if eventlet.patcher.is_monkey_patched('socket'):
+    # trollius must use call original socket and threading functions.
+    # Examples: socket.socket(), socket.socketpair(),
+    # threading.current_thread().
+    asyncio.base_events.socket = socket
+    asyncio.events.threading = threading
+    if sys.platform == 'win32':
+        asyncio.windows_events.socket = socket
+        asyncio.windows_utils.socket = socket
+    else:
+        asyncio.unix_events.socket = socket
+        asyncio.unix_events.threading = threading
+    # FIXME: patch also trollius.py3_ssl
 
 _READ = eventlet.hubs.hub.READ
 _WRITE = eventlet.hubs.hub.WRITE
@@ -83,26 +75,6 @@ _BLOCKING_IO_ERRNOS = set((
 
 def _is_main_thread():
     return isinstance(threading.current_thread(), threading._MainThread)
-
-
-class EventLoopPolicy(asyncio.AbstractEventLoopPolicy):
-    def __init__(self):
-        self._loop = None
-
-    def get_event_loop(self):
-        if not _is_main_thread():
-            return None
-        if self._loop is None:
-            self._loop = EventLoop()
-        return self._loop
-
-    def new_event_loop(self):
-        return EventLoop()
-
-    def set_event_loop(self, loop):
-        if not _is_main_thread():
-            raise NotImplementedError("aiogreen can only run in the main thread")
-        self._loop = loop
 
 
 class SocketTransport(selector_events._SelectorSocketTransport):
@@ -411,3 +383,7 @@ class EventLoop(base_events.BaseEventLoop):
     def _make_socket_transport(self, sock, protocol, waiter=None,
                                extra=None, server=None):
         return SocketTransport(self, sock, protocol, waiter, extra, server)
+
+
+class EventLoopPolicy(asyncio.DefaultEventLoopPolicy):
+    _loop_factory = EventLoop
