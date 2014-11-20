@@ -33,6 +33,8 @@ Version 0.2 (development version)
 
 * Support also eventlet 0.14, not only eventlet 0.15 or newer
 * Support eventlet with monkey-patching
+* Rewrite the code handling file descriptors to ensure that the listener is
+  only called once per loop iteration, to respect asyncio specification.
 * sock_connect() is now asynchronous
 * Add a suite of automated unit tests
 * Fix EventLoop.stop(): don't stop immediatly, but schedule stopping the event
