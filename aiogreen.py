@@ -386,7 +386,7 @@ class EventLoop(BaseEventLoop):
         # FIXME: optimization, reschedule _run_once() if the cancelled timer
         # was the next timer
 
-    def stop(self):
+    def _stop(self):
         if self._stop_event is None:
             # not running
             return
@@ -394,6 +394,9 @@ class EventLoop(BaseEventLoop):
             # stop already scheduled
             return
         self._stop_event.send("stop")
+
+    def stop(self):
+        self.call_soon(self._stop)
 
     def run_forever(self):
         if self._stop_event is not None:

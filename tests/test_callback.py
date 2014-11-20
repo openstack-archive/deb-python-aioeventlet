@@ -24,10 +24,10 @@ class CallbackTests(tests.TestCase):
             self.loop.stop()
 
         self.loop.call_soon(hello)
-        self.loop.call_soon(self.loop.stop)
+        self.loop.stop()
         self.loop.call_soon(world)
-        self.loop.run_forever()
 
+        self.loop.run_forever()
         self.assertEqual(result, ["Hello"])
 
         self.loop.run_forever()
