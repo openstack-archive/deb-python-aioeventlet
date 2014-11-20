@@ -67,6 +67,8 @@ Version 0.2 (development version)
   only called once per loop iteration, to respect asyncio specification.
 * Simplify the loop iteration: remove custom code to reuse instead the
   asyncio/trollius code (_run_once)
+* Reuse call_soon, call_soon_threadsafe, call_at, call_later from
+  asyncio/trollius, remove custom code
 * sock_connect() is now asynchronous
 * Add a suite of automated unit tests
 * Fix EventLoop.stop(): don't stop immediatly, but schedule stopping the event
