@@ -43,6 +43,7 @@ To run tests against other Python versions:
 
 * ``py26``: Python 2.6
 * ``py27``: Python 2.7
+* ``py27_patch``: Python 2.7 with eventlet monkey patching
 * ``py32``: Python 3.2
 * ``py33``: Python 3.3
 * ``py34``: Python 3.4
@@ -104,14 +105,17 @@ Tests of aiogreen 0.1:
 * Tested with asyncio 0.4.1 and 3.4.2
 
 
-Not supported (yet)
-===================
+To do (Not supported)
+=====================
 
 * run an event loop in a thread different than the main thread
 * sockets: create_server, sock_recv
 * pipes: connect_read_pipe
 * subprocesses: need pipes
 * signal handlers: add_signal_handler (only for pyevent hub?)
+* tox.ini: add py33_patch. eventlet with Python 3 and monkey-patch causes
+  an issue in importlib.
+
 
 eventlet and Python 3
 =====================
