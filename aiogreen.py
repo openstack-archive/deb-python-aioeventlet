@@ -305,15 +305,6 @@ class EventLoop(base_events.BaseEventLoop):
         self._thread_queue.put(handle)
         return handle
 
-    def call_at(self, when, callback, *args):
-        timer = asyncio.TimerHandle(when, callback, args, self)
-        heapq.heappush(self._scheduled, timer)
-        return timer
-
-    def call_later(self, delay, callback, *args):
-        when = self.time() + delay
-        return self.call_at(when, callback, *args)
-
     def run_forever(self):
         # Start to thread queue in run_forever() to create a greenthread linked
         # to the current greenthread
