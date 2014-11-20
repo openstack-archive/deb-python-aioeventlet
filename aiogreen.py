@@ -400,7 +400,7 @@ class EventLoop(BaseEventLoop):
 
     def run_forever(self):
         if self._stop_event is not None:
-            raise RuntimeError("reentrant call to run_forever()")
+            raise RuntimeError("Cannot close a running event loop")
 
         # Start to thread queue in run_forever() to create a greenthread linked
         # to the current greenthread
