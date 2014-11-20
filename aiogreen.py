@@ -87,10 +87,8 @@ class _TpoolExecutor(object):
 class _Selector(selectors._BaseSelectorImpl):
     def __init__(self, loop, hub):
         super(_Selector, self).__init__()
-        self._notified = {
-            _READ: set(),
-            _WRITE: set(),
-        }
+        # fd => events
+        self._notified = {}
         self._loop = loop
         self._hub = hub
         # eventlet.event.Event() used by FD notifiers to wake up select()
@@ -131,9 +129,9 @@ class _Selector(selectors._BaseSelectorImpl):
         try:
             listener = self._hub.listeners[event_type][fd]
         except KeyError:
-            return False
-        self._hub.remove(listener)
-        return True
+            pass
+        else:
+            self._hub.remove(listener)
 
     def unregister(self, fileobj):
         key = super(_Selector, self).unregister(fileobj)
@@ -141,17 +139,20 @@ class _Selector(selectors._BaseSelectorImpl):
         self._remove(key.fd, selectors.EVENT_WRITE)
         return key
 
-    def _notify(self, event_type, fd):
-        self._notified[event_type].add(fd)
+    def _notify(self, fd, event):
+        if fd in self._notified:
+            self._notified[fd] |= event
+        else:
+            self._notified[fd] = event
         if self._event is not None and not self._event.ready():
             # wakeup the select() method
             self._event.send("ready")
 
     def _notify_read(self, fd):
-        self._notify(_READ, fd)
+        self._notify(fd, selectors.EVENT_READ)
 
     def _notify_write(self, fd):
-        self._notify(_WRITE, fd)
+        self._notify(fd, selectors.EVENT_WRITE)
 
     def _throwback(self, fd):
         # FIXME: do something with the FD in this case?
@@ -159,19 +160,11 @@ class _Selector(selectors._BaseSelectorImpl):
 
     def _read_events(self):
         notified = self._notified
-        self._notified = {
-            _READ: set(),
-            _WRITE: set(),
-        }
+        self._notified = {}
         ready = []
-        for event_type in (_READ, _WRITE):
-            for fd in notified[event_type]:
-                key = self.get_key(fd)
-                reader, writer = key.data
-                if event_type == _READ:
-                    ready.append((fd, reader))
-                else:
-                    ready.append((fd, writer))
+        for fd, events in notified.items():
+            key = self.get_key(fd)
+            ready.append((key, events & key.events))
         return ready
 
     def select(self, timeout):
@@ -221,10 +214,6 @@ class EventLoop(asyncio.SelectorEventLoop):
 
     def time(self):
         return self._hub.clock()
-
-    def _process_events(self, events):
-        for fd, handle in events:
-            self._ready.append(handle)
 
 
 class EventLoopPolicy(asyncio.DefaultEventLoopPolicy):
