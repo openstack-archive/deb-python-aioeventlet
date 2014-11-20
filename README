@@ -112,3 +112,24 @@ Not supported (yet)
 * pipes: connect_read_pipe
 * subprocesses: need pipes
 * signal handlers: add_signal_handler (only for pyevent hub?)
+
+eventlet and Python 3
+=====================
+
+Issues:
+
+* https://github.com/eventlet/eventlet/issues/6 (root py3 issue)
+* https://github.com/eventlet/eventlet/issues/157 (py3 related?)
+* https://github.com/eventlet/eventlet/issues/153 (py3 related?)
+
+Pull requests:
+
+* https://github.com/eventlet/eventlet/pull/99 : complete monkey-patching
+* => commit: https://github.com/therve/eventlet/commit/9c3118162cf1ca1e50be330ba2a289f054c48d3c
+* https://github.com/eventlet/eventlet/pull/160 (py3 related?)
+
+OpenStack Kilo Summit:
+
+* https://etherpad.openstack.org/p/kilo-oslo-python-3
+* https://etherpad.openstack.org/p/kilo-oslo-oslo.messaging
+* https://etherpad.openstack.org/p/py34-transition (tangentially related)
