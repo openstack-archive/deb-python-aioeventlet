@@ -191,6 +191,9 @@ class EventLoop(base_events.BaseEventLoop):
         # that we always use the same hub
         self._hub = eventlet.hubs.get_hub()
 
+        # Force a call to set_debug() to set hub.debug_blocking
+        self.set_debug(self.get_debug())
+
         self._ssock = None
         self._csock = None
         self._make_self_pipe()
