@@ -112,10 +112,6 @@ class SocketTransport(selector_events._SelectorSocketTransport):
         return '<%s fd=%s>' % (self.__class__.__name__, self._sock_fd)
 
 
-def noop(*args, **kw):
-    pass
-
-
 class _TpoolExecutor(object):
     def __init__(self, loop):
         import eventlet.tpool
@@ -234,14 +230,6 @@ class EventLoop(base_events.BaseEventLoop):
 
     def time(self):
         return self._hub.clock()
-
-    def _call(self, handle):
-        if handle._cancelled:
-            return
-        handle._run()
-
-    def _call_soon_handle(self, handle):
-        self._ready.append(handle)
 
     def _process_events(self, events):
         for fd, handle in events:
