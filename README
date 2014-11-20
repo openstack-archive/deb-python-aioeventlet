@@ -35,6 +35,8 @@ Version 0.2 (development version)
 * Support eventlet with monkey-patching
 * Rewrite the code handling file descriptors to ensure that the listener is
   only called once per loop iteration, to respect asyncio specification.
+* Simplify the loop iteration: remove custom code to reuse instead the
+  asyncio/trollius code (_run_once)
 * sock_connect() is now asynchronous
 * Add a suite of automated unit tests
 * Fix EventLoop.stop(): don't stop immediatly, but schedule stopping the event
