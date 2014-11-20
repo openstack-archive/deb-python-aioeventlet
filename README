@@ -111,6 +111,7 @@ Tests of aiogreen 0.1:
 To do (Not supported)
 =====================
 
+* add_reader() does only support one callback per file descriptor currently.
 * run an event loop in a thread different than the main thread
 * sockets: create_server, sock_recv
 * pipes: connect_read_pipe
