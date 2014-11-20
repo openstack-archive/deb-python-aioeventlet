@@ -24,10 +24,11 @@ class TcpEchoClientProtocol(tests.asyncio.Protocol):
 
 
 class TcpServer(threading.Thread):
-    def __init__(self, host, port):
+    def __init__(self, host, port, event):
         super(TcpServer, self).__init__()
         self.host = host
         self.port = port
+        self.event = event
         self.sock = None
         self.client = None
 
@@ -39,6 +40,7 @@ class TcpServer(threading.Thread):
             sock.bind((self.host, self.port))
             sock.listen(1)
 
+            self.event.set()
             client, addr = sock.accept()
             self.client = client
             try:
@@ -61,9 +63,11 @@ class NetworkTests(tests.TestCase):
         host = '127.0.0.1'
         message = b'Hello World!'
 
-        server = TcpServer(host, port)
+        event = threading.Event()
+        server = TcpServer(host, port, event)
         server.start()
         self.addCleanup(server.stop)
+        event.wait()
 
         proto = TcpEchoClientProtocol(message, self.loop)
         coro = self.loop.create_connection(lambda: proto, host, port)
