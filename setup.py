@@ -1,8 +1,13 @@
 # Release procedure:
-#  - (fill changelog, FIXME: no changelog yet)
-#  - (run unit tests, FIXME: no test yet)
+#  - fill the changelog
+#  - run unit tests on Linux: run "tox"
+#  - run unit tests on Windows, run::
+#
+#       \Python27\python.exe runtest.py -r
+#       \Python27\python.exe runtest.py -r -m
+#
 #  - update the version in setup.py to X.Y
-#  - (set release date in the changelog, FIXME: no changelog yet)
+#  - set release date in README
 #  - check that "python setup.py sdist" contains all files tracked by
 #    the SCM (Mercurial), or update MANIFEST.in
 #  - hg ci
@@ -39,7 +44,7 @@ with open("README") as fp:
 
 install_options = {
     "name": "aiogreen",
-    "version": "0.1+",
+    "version": "0.2",
     "license": "Apache License 2.0",
     "author": 'Victor Stinner',
     "author_email": 'victor.stinner@gmail.com',
