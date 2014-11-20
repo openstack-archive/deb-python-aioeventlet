@@ -120,6 +120,18 @@ To do (Not supported)
   an issue in importlib.
 
 
+eventlet issues
+===============
+
+* eventlet monkey patching on Python 3 is incomplete. The most blocking issue
+  is in the importlib: the thread module is patched to use greenthreads, but
+  importlib really need to work on real threads.
+* eventlet.tpool.setup() seems to be broken on Windows in eventlet 0.15:
+  https://github.com/eventlet/eventlet/pull/167
+* hub.debug_blocking is implemented with signal.alarm() which is is not
+  available on Windows.
+
+
 eventlet and Python 3
 =====================
 
