@@ -1,16 +1,10 @@
-import errno
 import eventlet.hubs.hub
-import functools
 import sys
 socket = eventlet.patcher.original('socket')
 threading = eventlet.patcher.original('threading')
 
 try:
     import asyncio
-    from asyncio import base_events
-    from asyncio import selector_events
-    from asyncio import selectors
-    from asyncio.log import logger
 
     if sys.platform == 'win32':
         from asyncio.windows_utils import socketpair
@@ -18,10 +12,6 @@ try:
         socketpair = socket.socketpair
 except ImportError:
     import trollius as asyncio
-    from trollius import base_events
-    from trollius import selector_events
-    from trollius import selectors
-    from trollius.log import logger
 
     if sys.platform == 'win32':
         from trollius.windows_utils import socketpair
@@ -42,22 +32,16 @@ if eventlet.patcher.is_monkey_patched('socket'):
         asyncio.unix_events.threading = threading
     # FIXME: patch also trollius.py3_ssl
 
-_READ = eventlet.hubs.hub.READ
-_WRITE = eventlet.hubs.hub.WRITE
+_EVENT_READ = asyncio.selectors.EVENT_READ
+_EVENT_WRITE = asyncio.selectors.EVENT_WRITE
+_HUB_READ = eventlet.hubs.hub.READ
+_HUB_WRITE = eventlet.hubs.hub.WRITE
 
 # Eventlet 0.15 or newer?
 _EVENTLET15 = hasattr(eventlet.hubs.hub.noop, 'mark_as_closed')
 
-# Error numbers catched by Python 3.3 BlockingIOError exception
-_BLOCKING_IO_ERRNOS = set((
-    errno.EAGAIN,
-    errno.EALREADY,
-    errno.EINPROGRESS,
-    errno.EWOULDBLOCK,
-))
 
-
-class SocketTransport(selector_events._SelectorSocketTransport):
+class SocketTransport(asyncio.selector_events._SelectorSocketTransport):
     def __repr__(self):
         # override repr because _SelectorSocketTransport depends on
         # loop._selector
@@ -84,7 +68,7 @@ class _TpoolExecutor(object):
         self._tpool.killall()
 
 
-class _Selector(selectors._BaseSelectorImpl):
+class _Selector(asyncio.selectors._BaseSelectorImpl):
     def __init__(self, loop, hub):
         super(_Selector, self).__init__()
         # fd => events
@@ -101,11 +85,11 @@ class _Selector(selectors._BaseSelectorImpl):
         super(_Selector, self).close()
 
     def _add(self, fd, event):
-        if event == selectors.EVENT_READ:
-            event_type = _READ
+        if event == _EVENT_READ:
+            event_type = _HUB_READ
             func = self._notify_read
         else:
-            event_type = _WRITE
+            event_type = _HUB_WRITE
             func = self._notify_write
 
         if _EVENTLET15:
@@ -115,17 +99,17 @@ class _Selector(selectors._BaseSelectorImpl):
 
     def register(self, fileobj, events, data=None):
         key = super(_Selector, self).register(fileobj, events, data)
-        if events & selectors.EVENT_READ:
-            self._add(key.fd, selectors.EVENT_READ)
-        if events & selectors.EVENT_WRITE:
-            self._add(key.fd, selectors.EVENT_WRITE)
+        if events & _EVENT_READ:
+            self._add(key.fd, _EVENT_READ)
+        if events & _EVENT_WRITE:
+            self._add(key.fd, _EVENT_WRITE)
         return key
 
     def _remove(self, fd, event):
-        if event == selectors.EVENT_READ:
-            event_type = _READ
+        if event == _EVENT_READ:
+            event_type = _HUB_READ
         else:
-            event_type = _WRITE
+            event_type = _HUB_WRITE
         try:
             listener = self._hub.listeners[event_type][fd]
         except KeyError:
@@ -135,8 +119,8 @@ class _Selector(selectors._BaseSelectorImpl):
 
     def unregister(self, fileobj):
         key = super(_Selector, self).unregister(fileobj)
-        self._remove(key.fd, selectors.EVENT_READ)
-        self._remove(key.fd, selectors.EVENT_WRITE)
+        self._remove(key.fd, _EVENT_READ)
+        self._remove(key.fd, _EVENT_WRITE)
         return key
 
     def _notify(self, fd, event):
@@ -149,10 +133,10 @@ class _Selector(selectors._BaseSelectorImpl):
             self._event.send("ready")
 
     def _notify_read(self, fd):
-        self._notify(fd, selectors.EVENT_READ)
+        self._notify(fd, _EVENT_READ)
 
     def _notify_write(self, fd):
-        self._notify(fd, selectors.EVENT_WRITE)
+        self._notify(fd, _EVENT_WRITE)
 
     def _throwback(self, fd):
         # FIXME: do something with the FD in this case?
