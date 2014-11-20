@@ -1,25 +1,16 @@
-import sys
 import errno
-import eventlet.greenio
-import eventlet.semaphore
 import eventlet.hubs.hub
 import functools
-import heapq
+import sys
 socket = eventlet.patcher.original('socket')
 threading = eventlet.patcher.original('threading')
-try:
-    # Python 2
-    import Queue as queue
-except ImportError:
-    import queue
+
 try:
     import asyncio
     from asyncio import base_events
     from asyncio import selector_events
     from asyncio import selectors
     from asyncio.log import logger
-
-    _FUTURE_CLASSES = (asyncio.Future,)
 
     if sys.platform == 'win32':
         from asyncio.windows_utils import socketpair
@@ -31,13 +22,6 @@ except ImportError:
     from trollius import selector_events
     from trollius import selectors
     from trollius.log import logger
-
-    if hasattr(asyncio.tasks, '_FUTURE_CLASSES'):
-        # Trollius 1.0.0
-        _FUTURE_CLASSES = asyncio.tasks._FUTURE_CLASSES
-    else:
-        # Trollius >= 1.0.1
-        _FUTURE_CLASSES = asyncio.futures._FUTURE_CLASSES
 
     if sys.platform == 'win32':
         from trollius.windows_utils import socketpair
@@ -71,10 +55,6 @@ _BLOCKING_IO_ERRNOS = set((
     errno.EINPROGRESS,
     errno.EWOULDBLOCK,
 ))
-
-
-def _is_main_thread():
-    return isinstance(threading.current_thread(), threading._MainThread)
 
 
 class SocketTransport(selector_events._SelectorSocketTransport):
