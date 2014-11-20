@@ -31,12 +31,12 @@ class TimerTests(tests.TestCase):
             result.append("World")
             loop.stop()
 
-        self.loop.call_later(0.010, hello)
-        self.loop.call_later(0.020, self.loop.stop)
-        self.loop.call_later(0.030, world, self.loop)
+        self.loop.call_later(0.050, hello)
+        self.loop.call_later(0.100, self.loop.stop)
+        self.loop.call_later(0.150, world, self.loop)
         self.loop.run_forever()
 
-        eventlet.sleep(0.050)
+        eventlet.sleep(0.200)
         self.assertEqual(result, ["Hello"])
 
         self.loop.run_forever()
