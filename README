@@ -85,6 +85,8 @@ Changes:
 * Setting debug mode of the event loop doesn't enable "debug_blocking" of
   eventlet on Windows anymore, the feature is not implemented on Windows
   in eventlet.
+* add_reader() and add_writer() now cancels the previous handle and sets
+  a new handle
 
 2014-11-19: version 0.1
 -----------------------

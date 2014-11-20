@@ -97,9 +97,33 @@ class _Selector(object):
         self._event = None
         self._loop = loop
 
-    def register(self, event_type, fd, handle):
-        # FIXME: support multiple callbacks for fd
-        self._listeners[event_type][fd] = handle
+    def get_key(self, fileobj):
+        fd = selectors._fileobj_to_fd(fileobj)
+        events = 0
+        reader = self._listeners[_READ].get(fd)
+        if reader is not None:
+            events |= selectors.EVENT_READ
+
+        writer = self._listeners[_WRITE].get(fd)
+        if writer is not None:
+            events |= selectors.EVENT_WRITE
+
+        if not events:
+            raise KeyError("{0!r} is not registered".format(fileobj))
+
+        data = (reader, writer)
+        key = selectors.SelectorKey(fileobj, fd, events, data)
+        return key
+
+    def register(self, fd, events, handle):
+        if (not events) or (events & ~(selectors.EVENT_READ | selectors.EVENT_WRITE)):
+            raise ValueError("Invalid events: {0!r}".format(events))
+
+        if events & selectors.EVENT_READ:
+            self._listeners[_READ][fd] = handle
+        if events & selectors.EVENT_WRITE:
+            self._listeners[_WRITE][fd] = handle
+        # FIXME: return key
 
     def unregister(self, event_type, fd):
         try:
@@ -248,31 +272,46 @@ class EventLoop(base_events.BaseEventLoop):
     # FIXME: code adapted from trollius
     # ---
 
-    def _add_fd(self, event_type, fd, callback, args):
+    def _add_fd(self, event, fd, callback, args):
         fd = selectors._fileobj_to_fd(fd)
-        handle = asyncio.Handle(callback, args, self)
+        new_handle = asyncio.Handle(callback, args, self)
 
-        if event_type == _READ:
+        if event == selectors.EVENT_READ:
+            event_type = _READ
             func = self._selector.notify_read
         else:
+            event_type = _WRITE
             func = self._selector.notify_write
 
-        self._selector.register(event_type, fd, handle)
         try:
+            key = self._selector.get_key(fd)
+        except KeyError:
+            # file descriptor not registered yet
+            register = True
+            handle = None
+        else:
+            reader, writer = key.data
+            if event == selectors.EVENT_READ:
+                handle = reader
+            else:
+                handle = writer
+            register = (handle is None)
+
+        if register:
             if _EVENTLET15:
                 throwback = self._selector.throwback
                 self._hub.add(event_type, fd, func, throwback, None)
             else:
                 self._hub.add(event_type, fd, func)
-        except:
-            self._selector.unregister(event_type, fd)
-            raise
+        self._selector.register(fd, event, new_handle)
+        if handle is not None:
+            handle.cancel()
 
     def add_reader(self, fd, callback, *args):
-        self._add_fd(_READ, fd, callback, args)
+        self._add_fd(selectors.EVENT_READ, fd, callback, args)
 
     def add_writer(self, fd, callback, *args):
-        self._add_fd(_WRITE, fd, callback, args)
+        self._add_fd(selectors.EVENT_WRITE, fd, callback, args)
 
     def _remove_fd(self, event_type, fd):
         fd = selectors._fileobj_to_fd(fd)
