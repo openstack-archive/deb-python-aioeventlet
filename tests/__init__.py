@@ -1,9 +1,13 @@
 import aiogreen
-import unittest
 try:
     import asyncio
 except ImportError:
     import trollius as asyncio
+try:
+    # On Python 2.6, unittest2 is needed to get new features like addCleanup()
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 class TestCase(unittest.TestCase):
     def setUp(self):
