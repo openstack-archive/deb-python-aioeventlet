@@ -75,6 +75,9 @@ Version 0.2 (development version)
 * Fix EventLoop.stop(): don't stop immediatly, but schedule stopping the event
   loop with call_soon()
 * Add tox.ini to run tests with tox
+* Setting debug mode of the event loop doesn't enable "debug_blocking" of
+  eventlet on Windows anymore, the feature is not implemented on Windows
+  in eventlet.
 
 2014-11-19: version 0.1
 -----------------------
