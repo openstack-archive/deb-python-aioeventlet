@@ -7,18 +7,17 @@ aiogreen
    :target: https://www.flickr.com/photos/haypo/7181768969/in/set-72157629731066236
 
 aiogreen implements the asyncio API (`PEP 3156
-<http://www.python.org/dev/peps/pep-3156/>`_) on top of eventet. It makes
+<http://www.python.org/dev/peps/pep-3156/>`_) on top of eventlet. It makes
 possible to write asyncio code in a project currently written for eventlet.
 
 aiogreen allows to use greenthreads in asyncio coroutines, and to use asyncio
 coroutines, tasks and futures in greenthreads: see :func:`link_future` and
 :func:`wrap_greenthread` functions.
 
-The main visible difference between trollius and aiogreen is that
+The main visible difference between aiogreen and trollius is the behaviour of
 ``run_forever()``: ``run_forever()`` blocks with trollius, whereas it runs in a
-greenthread with aiogreen. It means that it's possible to call
-``run_forever()`` in the main thread and execute other greenthreads in
-parallel.
+greenthread with aiogreen. It means that aiogreen event loop can run in an
+greenthread while the Python main thread runs other greenthreads in parallel.
 
 * `aiogreen documentation <http://aiogreen.readthedocs.org/>`_
 * `aiogreen project in the Python Cheeseshop (PyPI)
