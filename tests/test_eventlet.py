@@ -138,23 +138,27 @@ def wait_task(task):
     return event.wait()
 
 def greenthread_chain_coro(result, loop):
-    t1 = loop.create_task(coro_slow_append(result, 1, 0.2))
-    value = wait_task(t1)
-    result.append(value)
-
-    t2 = loop.create_task(coro_slow_append(result, 2, 0.1))
-    value = wait_task(t2)
-    result.append(value)
-
-    t3 = loop.create_task(coro_slow_error(0.001))
     try:
-        value = wait_task(t3)
-    except ValueError as exc:
-        result.append(str(exc))
+        t1 = asyncio.async(coro_slow_append(result, 1, 0.2), loop=loop)
+        value = wait_task(t1)
+        result.append(value)
 
-    result.append(4)
-    loop.call_soon(loop.stop)
-    return result
+        t2 = asyncio.async(coro_slow_append(result, 2, 0.1), loop=loop)
+        value = wait_task(t2)
+        result.append(value)
+
+        t3 = asyncio.async(coro_slow_error(0.001), loop=loop)
+        try:
+            value = wait_task(t3)
+        except ValueError as exc:
+            result.append(str(exc))
+
+        result.append(4)
+        return result
+    except Exception as exc:
+        result.append(repr(exc))
+    finally:
+        loop.call_soon(loop.stop)
 
 
 class EventletTests(tests.TestCase):
