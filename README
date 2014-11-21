@@ -1,5 +1,5 @@
-aiogreen implements the asyncio API on top of eventet. It makes possible to
-write asyncio code in a project currently written for eventlet.
+aiogreen implements the asyncio API (PEP 3156) on top of eventet. It makes
+possible to write asyncio code in a project currently written for eventlet.
 
 aiogreen allows to use greenthreads in asyncio coroutines, and to use asyncio
 coroutines, tasks and futures in greenthreads: see ``link_future()`` and
