@@ -9,7 +9,7 @@ try:
 except ImportError:
     import unittest
 try:
-    from unittest.mock import mock
+    from unittest import mock
 except ImportError:
     import mock
 
