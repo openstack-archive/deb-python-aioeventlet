@@ -1,5 +1,8 @@
+import aiogreen
 import eventlet
 import tests
+from tests import unittest
+
 
 def eventlet_slow_append(result, value, delay):
     eventlet.sleep(delay)
@@ -33,22 +36,25 @@ try:
             return value
 
         @asyncio.coroutine
-        def coro_chain_greenthread():
+        def coro_wrap_greenthread():
             result = []
             loop = asyncio.get_event_loop()
 
             g1 = eventlet.spawn(eventlet_slow_append, result, 1, 0.2)
 
-            value = yield from wait_greenthread(g1, loop=loop)
+            fut = aiogreen.wrap_greenthread(g1, loop=loop)
+            value = yield from fut
             result.append(value)
 
             g2 = eventlet.spawn(eventlet_slow_append, result, 2, 0.1)
-            value = yield from wait_greenthread(g2, loop=loop)
+            fut = aiogreen.wrap_greenthread(g2, loop=loop)
+            value = yield from fut
             result.append(value)
 
             g3 = eventlet.spawn(eventlet_slow_error, 0.001)
+            fut = aiogreen.wrap_greenthread(g3, loop=loop)
             try:
-                yield from wait_greenthread(g3, loop=loop)
+                yield from fut
             except ValueError as exc:
                 result.append(str(exc))
 
@@ -89,22 +95,24 @@ except ImportError:
         raise Return(value)
 
     @asyncio.coroutine
-    def coro_chain_greenthread():
+    def coro_wrap_greenthread():
         result = []
         loop = asyncio.get_event_loop()
 
         g1 = eventlet.spawn(eventlet_slow_append, result, 1, 0.2)
-
-        value = yield From(wait_greenthread(g1, loop=loop))
+        fut = aiogreen.wrap_greenthread(g1, loop=loop)
+        value = yield From(fut)
         result.append(value)
 
         g2 = eventlet.spawn(eventlet_slow_append, result, 2, 0.1)
-        value = yield From(wait_greenthread(g2, loop=loop))
+        fut = aiogreen.wrap_greenthread(g2, loop=loop)
+        value = yield From(fut)
         result.append(value)
 
         g3 = eventlet.spawn(eventlet_slow_error, 0.001)
+        fut = aiogreen.wrap_greenthread(g3, loop=loop)
         try:
-            yield From(wait_greenthread(g3, loop=loop))
+            yield From(fut)
         except ValueError as exc:
             result.append(str(exc))
 
@@ -123,7 +131,7 @@ except ImportError:
         raise ValueError("error")
 
 
-def wait_task(task):
+def link_task(task):
     event = eventlet.event.Event()
     def done(fut):
         try:
@@ -137,19 +145,19 @@ def wait_task(task):
     task.add_done_callback(done)
     return event.wait()
 
-def greenthread_chain_coro(result, loop):
+def greenthread_link_task(result, loop):
     try:
         t1 = asyncio.async(coro_slow_append(result, 1, 0.2), loop=loop)
-        value = wait_task(t1)
+        value = link_task(t1)
         result.append(value)
 
         t2 = asyncio.async(coro_slow_append(result, 2, 0.1), loop=loop)
-        value = wait_task(t2)
+        value = link_task(t2)
         result.append(value)
 
         t3 = asyncio.async(coro_slow_error(0.001), loop=loop)
         try:
-            value = wait_task(t3)
+            value = link_task(t3)
         except ValueError as exc:
             result.append(str(exc))
 
@@ -204,13 +212,14 @@ class EventletTests(tests.TestCase):
         self.loop.run_forever()
         self.assertEqual(result, ["spawn", "spawn_after"])
 
-    def test_coro_chain_greenthread(self):
-        result = self.loop.run_until_complete(coro_chain_greenthread())
+    def test_coro_wrap_greenthread(self):
+        result = self.loop.run_until_complete(coro_wrap_greenthread())
         self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
 
-    def test_greenthread_chain_coro(self):
+    def test_greenthread_link_task(self):
         result = []
-        self.loop.call_soon(eventlet.spawn, greenthread_chain_coro, result, self.loop)
+        self.loop.call_soon(eventlet.spawn,
+                            greenthread_link_task, result, self.loop)
         self.loop.run_forever()
         self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
 
