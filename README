@@ -75,7 +75,7 @@ Hello World::
 Use a greenthread in a coroutine
 --------------------------------
 
-Use the ``wrap_greenthread()`` function to wrap a greenthread into a Future
+Use the ``wrap_greenthread(gt)`` function to wrap a greenthread into a Future
 object. The Future object waits for the completion of a greenthread.
 
 Example with asyncio::
@@ -96,11 +96,32 @@ logged to sys.stderr by eventlet, even if it is correctly copied to the Future
 object.
 
 
+Use a coroutine in a greenthread
+--------------------------------
+
+Use the ``link_future(future)`` function to wait for a future or a task from a
+greenthread. The function returns the result or raise the exception of the
+future.
+
+Example with asyncio::
+
+    def coro_slow_sum(x, y):
+        yield from asyncio.sleep(1.0)
+        return x + y
+
+    def green_sum():
+        task = asyncio.async(coro_slow_sum(1, 2))
+        value = aiogreen.link_future(task)
+        return value
+
+
 API
 ===
 
 Functions which are not in asyncio:
 
+* ``link_future(future)``: wait for a future (or a task) from a greenthread,
+  return the result or raise the exception of the future
 * ``wrap_greenthread(gt)``: wrap a greenthread into a Future object
 
 
@@ -171,7 +192,9 @@ only call the callback once per loop iteration.
 
 Changes:
 
-* Add the ``wrap_greenthread()`` function to wrap a greenthread into a Future
+* Add the ``link_future(future)`` function: wait for a future from a
+  greenthread.
+* Add the ``wrap_greenthread(gt)`` function: wrap a greenthread into a Future
 * Support also eventlet 0.14, not only eventlet 0.15 or newer
 * Support eventlet with monkey-patching
 * Rewrite the code handling file descriptors to ensure that the listener is
