@@ -263,6 +263,8 @@ To run tests against other Python versions:
 Run tests manually
 ------------------
 
+To run unit tests, the ``mock`` module is need on Python older than 3.3.
+
 Run the following command::
 
     python runtests.py -r
