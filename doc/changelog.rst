@@ -1,11 +1,15 @@
 Changelog
 =========
 
-Version 0.2 (development version)
----------------------------------
+2014-10-21: version 0.2
+-----------------------
 
 aiogreen event loop has been rewritten to reuse more asyncio/trollius code. It
 now only has a few specific code.
+
+It is now possible use greenthreads in asyncio coroutines, and to use asyncio
+coroutines, tasks and futures in greenthreads: see :func:`link_future` and
+:func:`wrap_greenthread` functions.
 
 All asyncio network are supported: TCP, UCP and UNIX clients and servers.
 
