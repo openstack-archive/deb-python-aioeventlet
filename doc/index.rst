@@ -114,6 +114,7 @@ aiogreen specific functions:
 
    Example with asyncio::
 
+       @asyncio.coroutine
        def coro_slow_sum(x, y):
            yield from asyncio.sleep(1.0)
            return x + y
@@ -197,7 +198,7 @@ To run tests against other Python versions:
 Run tests manually
 ------------------
 
-Run the following command from the directory of the aiogreen project:
+Run the following command from the directory of the aiogreen project::
 
     python runtests.py -r
 
