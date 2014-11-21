@@ -251,8 +251,12 @@ To run tests against other Python versions:
 * ``py26``: Python 2.6
 * ``py27``: Python 2.7
 * ``py27_patch``: Python 2.7 with eventlet monkey patching
+* ``py27_old``: Python 2.7 with the oldest supported versions of eventlet and
+  trollius
 * ``py32``: Python 3.2
 * ``py33``: Python 3.3
+* ``py33_old``: Python 3.3 with the oldest supported versions of eventlet and
+  tulip
 * ``py34``: Python 3.4
 
 Run tests manually
