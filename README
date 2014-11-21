@@ -90,8 +90,10 @@ Requirements:
 - asyncio or trollius:
 
   * Python 3.4 and newer: asyncio is now part of the stdlib
-  * Python 3.3: need Tulip 0.4.1 or newer (pip install asyncio)
-  * Python 2.6-3.2: need trollius 1.0 or newer (pip install trollius)
+  * Python 3.3: need Tulip 0.4.1 or newer (pip install asyncio),
+    but Tulip 3.4.1 or newer is recommended
+  * Python 2.6-3.2: need Trollius 0.3 or newer (pip install trollius),
+    but Trollius 1.0 or newer is recommended
 
 Type::
 
