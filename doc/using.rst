@@ -134,9 +134,11 @@ aiogreen specific functions:
 
 .. function:: wrap_greenthread(gt)
 
-   Wrap a greenthread into a Future object.
+   Wrap an eventlet GreenThread or a greenlet into a Future object.
 
    The Future object waits for the completion of a greenthread.
+
+   The greenlet must not be running.
 
    In debug mode, if the greenthread raises an exception, the exception is
    logged to ``sys.stderr`` by eventlet, even if the exception is copied to the

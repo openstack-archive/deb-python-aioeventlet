@@ -162,16 +162,98 @@ class EventletTests(tests.TestCase):
         self.loop.run_forever()
         self.assertEqual(result, ["spawn", "spawn_after"])
 
-    def test_coro_wrap_greenthread(self):
-        result = self.loop.run_until_complete(coro_wrap_greenthread())
-        self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
-
     def test_greenthread_link_future(self):
         result = []
         self.loop.call_soon(eventlet.spawn,
                             greenthread_link_future, result, self.loop)
         self.loop.run_forever()
         self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
+
+
+class WrapGreenthreadTests(tests.TestCase):
+    def test_wrap_greenthread(self):
+        def func():
+            eventlet.sleep(0.010)
+            return 'ok'
+
+        gt = eventlet.spawn(func)
+        fut = aiogreen.wrap_greenthread(gt)
+        result = self.loop.run_until_complete(fut)
+        self.assertEqual(result, 'ok')
+
+    def test_wrap_greenthread_running(self):
+        event = eventlet.event.Event()
+
+        def func():
+            return aiogreen.wrap_greenthread(gt)
+
+        gt = eventlet.spawn(func)
+        fut1 = aiogreen.wrap_greenthread(gt)
+        fut2 = self.loop.run_until_complete(fut1)
+        fut3 = self.loop.run_until_complete(fut2)
+        self.assertIs(fut3, fut2)
+
+    def test_wrap_greenthread_dead(self):
+        def func():
+            return 'ok'
+
+        gt = eventlet.spawn(func)
+        result = gt.wait()
+        self.assertEqual(result, 'ok')
+
+        fut = aiogreen.wrap_greenthread(gt)
+        result = self.loop.run_until_complete(fut)
+        self.assertEqual(result, 'ok')
+
+    def test_coro_wrap_greenthread(self):
+        result = self.loop.run_until_complete(coro_wrap_greenthread())
+        self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
+
+    def test_wrap_invalid_type(self):
+        def func():
+            pass
+        self.assertRaises(TypeError, aiogreen.wrap_greenthread, func)
+
+        @asyncio.coroutine
+        def coro_func():
+            pass
+        coro_obj = coro_func()
+        self.assertRaises(TypeError, aiogreen.wrap_greenthread, coro_obj)
+
+
+class WrapGreenletTests(tests.TestCase):
+    def test_wrap_greenlet(self):
+        def func():
+            eventlet.sleep(0.010)
+            return "ok"
+        gt = eventlet.spawn_n(func)
+        fut = aiogreen.wrap_greenthread(gt)
+        result = self.loop.run_until_complete(fut)
+        self.assertEqual(result, "ok")
+
+    def test_wrap_greenlet_running(self):
+        event = eventlet.event.Event()
+
+        def func():
+            try:
+                gt = eventlet.getcurrent()
+                fut = aiogreen.wrap_greenthread(gt)
+            except Exception as exc:
+                event.send_exception(exc)
+            else:
+                event.send(fut)
+
+        gt = eventlet.spawn_n(func)
+        self.assertRaises(RuntimeError, event.wait)
+
+    def test_wrap_greenlet_dead(self):
+        event = eventlet.event.Event()
+        def func():
+            event.send('done')
+        gt = eventlet.spawn_n(func)
+        event.wait()
+
+        self.assertRaises(RuntimeError, aiogreen.wrap_greenthread, gt)
 
 
 if __name__ == '__main__':
