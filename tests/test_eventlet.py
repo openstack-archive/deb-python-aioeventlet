@@ -18,24 +18,6 @@ try:
 
     exec('''if 1:
         @asyncio.coroutine
-        def wait_greenthread(gt, loop=None):
-            if loop is None:
-                loop = asyncio.get_event_loop()
-            fut = asyncio.Future(loop=loop)
-
-            def copy_result(gt):
-                try:
-                    value = gt.wait()
-                except Exception as exc:
-                    loop.call_soon(fut.set_exception, exc)
-                else:
-                    loop.call_soon(fut.set_result, value)
-            gt.link(copy_result)
-
-            value = yield from fut
-            return value
-
-        @asyncio.coroutine
         def coro_wrap_greenthread():
             result = []
             loop = asyncio.get_event_loop()
@@ -75,24 +57,6 @@ try:
 except ImportError:
     import trollius as asyncio
     from trollius import From, Return
-
-    @asyncio.coroutine
-    def wait_greenthread(gt, loop=None):
-        if loop is None:
-            loop = asyncio.get_event_loop()
-        fut = asyncio.Future(loop=loop)
-
-        def copy_result(gt):
-            try:
-                value = gt.wait()
-            except Exception as exc:
-                loop.call_soon(fut.set_exception, exc)
-            else:
-                loop.call_soon(fut.set_result, value)
-        gt.link(copy_result)
-
-        value = yield From(fut)
-        raise Return(value)
 
     @asyncio.coroutine
     def coro_wrap_greenthread():
