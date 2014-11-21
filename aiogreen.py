@@ -159,12 +159,15 @@ class _Selector(asyncio.selectors._BaseSelectorImpl):
         self._event = eventlet.event.Event()
         try:
             if timeout is not None:
-                # FIXME: don't use polling
-                endtime = self._loop.time() + timeout
-                while self._loop.time() <= endtime:
-                    if self._event.ready():
-                        break
-                    eventlet.sleep(0.010)
+                def timeout_cb(event):
+                    if event.ready():
+                        return
+                    event.send('timeout')
+
+                eventlet.spawn_after(timeout, timeout_cb, self._event)
+
+                self._event.wait()
+                # FIXME: cancel the timeout_cb if wait() returns 'ready'?
             else:
                 # blocking call
                 self._event.wait()
