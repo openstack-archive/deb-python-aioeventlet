@@ -7,6 +7,8 @@ Version 0.3 (development version)
 * :func:`wrap_greenthread` now raises an exception if the greenthread is
   running or already finished. In debug mode, the exception is not more logged
   to sys.stderr for greenthreads.
+* Fix eventlet detection of blocking tasks: cancel the alarm when the aiogreen
+  event loop stops.
 
 2014-10-21: version 0.2
 -----------------------

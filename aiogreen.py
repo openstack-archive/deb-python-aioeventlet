@@ -1,6 +1,7 @@
 import eventlet.hubs.hub
 import greenlet
 import logging
+import signal
 import sys
 socket = eventlet.patcher.original('socket')
 threading = eventlet.patcher.original('threading')
@@ -228,7 +229,18 @@ class EventLoop(asyncio.SelectorEventLoop):
         # Detect blocking eventlet functions. The feature is implemented with
         # signal.alarm() which is is not available on Windows.
         self._hub.debug_blocking = debug and (sys.platform != 'win32')
-        self._hub.debug_blocking_resolution = 0.1
+        if (self._hub.debug_blocking
+        and hasattr(self, 'slow_callback_duration')):
+            self._hub.debug_blocking_resolution = self.slow_callback_duration
+
+    def run_forever(self):
+        try:
+            super(EventLoop, self).run_forever()
+        finally:
+            if self._hub.debug_blocking:
+                # eventlet event loop is still running: cancel the current
+                # detection of blocking tasks
+                signal.alarm(0)
 
     def time(self):
         return self._hub.clock()
