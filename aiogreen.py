@@ -1,4 +1,5 @@
 import eventlet.hubs.hub
+import greenlet
 import sys
 socket = eventlet.patcher.original('socket')
 threading = eventlet.patcher.original('threading')
@@ -234,20 +235,41 @@ class EventLoopPolicy(asyncio.DefaultEventLoopPolicy):
 
 
 def wrap_greenthread(gt, loop=None):
-    """Wrap an eventlet greenthread into a Future object."""
+    """Wrap an eventlet GreenThread or a greenlet into a Future object.
+
+    The greenlet must not be running."""
     if loop is None:
         loop = asyncio.get_event_loop()
     fut = asyncio.Future(loop=loop)
 
-    def copy_result(gt):
-        try:
-            value = gt.wait()
-        except Exception as exc:
-            loop.call_soon(fut.set_exception, exc)
-        else:
-            loop.call_soon(fut.set_result, value)
+    if isinstance(gt, eventlet.greenthread.GreenThread):
+        def copy_result(gt):
+            try:
+                result = gt.wait()
+            except Exception as exc:
+                loop.call_soon(fut.set_exception, exc)
+            else:
+                loop.call_soon(fut.set_result, result)
 
-    gt.link(copy_result)
+        gt.link(copy_result)
+    elif isinstance(gt, greenlet.greenlet):
+        if gt:
+            raise RuntimeError("cannot wrap a running greenlet")
+        if gt.dead:
+            raise RuntimeError("cannot wrap a greenlet which already finished")
+
+        orig_func = gt.run
+        def wrap_func(*args, **kw):
+            try:
+                result = orig_func(*args, **kw)
+            except Exception as exc:
+                loop.call_soon(fut.set_exception, exc)
+            else:
+                loop.call_soon(fut.set_result, result)
+        gt.run = wrap_func
+    else:
+        raise TypeError("greenthread or greenlet request, not %s"
+                        % type(gt))
     return fut
 
 

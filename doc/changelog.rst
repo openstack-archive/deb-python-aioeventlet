@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.3 (development version)
+---------------------------------
+
+* :func:`wrap_greenthread` now also works on greenlet objects.
+
 2014-10-21: version 0.2
 -----------------------
 
