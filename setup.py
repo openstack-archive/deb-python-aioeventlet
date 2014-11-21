@@ -7,9 +7,9 @@
 #       \Python27\python.exe runtest.py -r -m
 #
 #  - update the version in setup.py and doc/conf.py to X.Y
-#  - set release date in README
+#  - set release date in doc/changelog.rst
 #  - check that "python setup.py sdist" contains all files tracked by
-#    the SCM (Mercurial), or update MANIFEST.in
+#    the SCM (Mercurial): update MANIFEST.in if needed
 #  - hg ci
 #  - hg tag X.Y
 #  - hg push
