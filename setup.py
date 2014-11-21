@@ -37,7 +37,7 @@ elif (3, 3) <= sys.version_info < (3, 4):
     requirements.append('asyncio>=0.4.1')
 else:
     # Python 2.6-3.2: use Trollius
-    requirements.append('trollius>=1.0')
+    requirements.append('trollius>=0.3')
 
 with open("README") as fp:
     long_description = fp.read()
