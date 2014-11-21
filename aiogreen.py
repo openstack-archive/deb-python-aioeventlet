@@ -32,6 +32,14 @@ if eventlet.patcher.is_monkey_patched('socket'):
         asyncio.unix_events.threading = threading
     # FIXME: patch also trollius.py3_ssl
 
+    # BaseDefaultEventLoopPolicy._Local must inherit from threading.local
+    # of the original threading module, not the patched threading module
+    class _Local(threading.local):
+        _loop = None
+        _set_called = False
+
+    asyncio.events.BaseDefaultEventLoopPolicy._Local = _Local
+
 _EVENT_READ = asyncio.selectors.EVENT_READ
 _EVENT_WRITE = asyncio.selectors.EVENT_WRITE
 _HUB_READ = eventlet.hubs.hub.READ
