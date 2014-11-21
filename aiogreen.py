@@ -263,10 +263,10 @@ def wrap_greenthread(gt, loop=None):
             try:
                 orig_main(*args, **kw)
             except Exception as exc:
-                loop.call_soon(fut.set_exception, exc)
+                fut.set_exception(exc)
             else:
                 result = gt.wait()
-                loop.call_soon(fut.set_result, result)
+                fut.set_result(result)
         gt.run = wrap_func
     else:
         orig_func = gt.run
@@ -274,9 +274,9 @@ def wrap_greenthread(gt, loop=None):
             try:
                 result = orig_func(*args, **kw)
             except Exception as exc:
-                loop.call_soon(fut.set_exception, exc)
+                fut.set_exception(exc)
             else:
-                loop.call_soon(fut.set_result, result)
+                fut.set_result(result)
         gt.run = wrap_func
     return fut
 
