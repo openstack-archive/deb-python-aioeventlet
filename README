@@ -4,6 +4,22 @@ asyncio event loop scheduling callbacks in eventlet.
 * aiogreen at PyPI: https://pypi.python.org/pypi/aiogreen
 
 
+Usage
+=====
+
+aiogreen implements the asyncio API, see asyncio documentation:
+https://docs.python.org/dev/library/asyncio.html
+
+To support Python 2, you can use Trollius which uses ``yield`` instead
+of ``yield from`` for coroutines:
+http://trollius.readthedocs.org/
+
+Using the event loop from greenthreads is not safe: calls to the event loop
+must be passed to ``call_soon_threadsafe()``. Example to stop the event loop:
+
+    eventlet.spawn(loop.call_soon_threadsafe, loop.stop)
+
+
 Installation
 ============
 
@@ -87,6 +103,8 @@ Changes:
   in eventlet.
 * add_reader() and add_writer() now cancels the previous handle and sets
   a new handle
+* In debug mode, detect calls to call_soon() from greenthreads which are not
+  threadsafe (would not wake up the event loop).
 
 2014-11-19: version 0.1
 -----------------------

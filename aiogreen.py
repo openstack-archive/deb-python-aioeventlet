@@ -199,6 +199,14 @@ class EventLoop(asyncio.SelectorEventLoop):
     def time(self):
         return self._hub.clock()
 
+    def _assert_is_current_event_loop(self):
+        super(EventLoop, self)._assert_is_current_event_loop()
+        if self._selector._event:
+            # call_soon() must not be called while selector.select() is
+            # running, it does not wake up the event loop
+            raise RuntimeError(
+                "Non-thread-safe operation invoked from a greenthread")
+
 
 class EventLoopPolicy(asyncio.DefaultEventLoopPolicy):
     _loop_factory = EventLoop
