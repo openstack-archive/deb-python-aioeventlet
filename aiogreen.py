@@ -192,6 +192,8 @@ class EventLoop(asyncio.SelectorEventLoop):
     def set_debug(self, debug):
         super(EventLoop, self).set_debug(debug)
 
+        self._hub.debug_exceptions = debug
+
         # Detect blocking eventlet functions. The feature is implemented with
         # signal.alarm() which is is not available on Windows.
         self._hub.debug_blocking = debug and (sys.platform != 'win32')
