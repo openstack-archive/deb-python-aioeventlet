@@ -114,6 +114,20 @@ Maybe the good one, aiogreen project:
 
 * November 19, 2014: First release of the aiogreen project
 
+OpenStack Kilo Summit, November 3-7, 2014, at Paris:
+
+* `Python 3 in Oslo <https://etherpad.openstack.org/p/kilo-oslo-python-3>`_:
+
+  * add a new greenio executor to Oslo Messaging
+  * port eventlet to Python 3 (with monkey-patching): see the :ref:`status of
+    the eventlet port to Python 3 <eventlet-py3>`
+
+* `What should we do about oslo.messaging?
+  <https://etherpad.openstack.org/p/kilo-oslo-oslo.messaging>`_: add the new
+  greenio executor
+
+* `Python 3.4 transition <https://etherpad.openstack.org/p/py34-transition>`_
+
 New try with a greenio executor for Oslo Messaging:
 
 * July 29, 2014: Doug Hellmann proposed the blueprint
@@ -137,6 +151,9 @@ First try with a trollius executor for Oslo Messaging:
 
 * Jun 20, 2014: Patch `Add an optional timeout parameter to Listener.poll
   <https://review.openstack.org/#/c/71003/>`_ merged into Oslo Messaging
+* May 28, 2014: Meeting at OpenStack in action with Doug Hellman, Julien
+  Danjou, Mehdi Abaakouk, Victor Stinner and Christophe to discuss the plan to
+  port OpenStack to Python 3 and switch from eventlet to asyncio.
 * April 23, 2014: Patch `Allow trollius 0.2
   <https://review.openstack.org/#/c/79901/>`_ merged into
   openstack/requirements

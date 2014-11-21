@@ -13,24 +13,26 @@ Methods:
 * stop()
 * coroutines and tasks
 
-Tests of aiogreen 0.1:
+aiogreen 0.1 was tested:
 
-* Tested on Python 2.7, 3.3 and 3.5
-* Tested on Linux and Windows
-* Tested with Trollius 1.0, 1.0.1 and 1.0.2
-* Tested with asyncio 0.4.1 and 3.4.2
+* on Python 2.7, 3.3 and 3.5
+* on Linux and Windows
+* with Trollius 1.0, 1.0.1 and 1.0.2
+* with asyncio 0.4.1 and 3.4.2
 
 
 To do (Not supported)
 =====================
 
+* wrap_greenthread() must not log the exception to sys.stderr if the
+  greenthread didn't start
 * run an event loop in a thread different than the main thread
 * sockets: create_server, sock_recv
 * pipes: connect_read_pipe
 * subprocesses: need pipes
 * signal handlers: add_signal_handler (only for pyevent hub?)
-* tox.ini: add py33_patch. eventlet with Python 3 and monkey-patch causes
-  an issue in importlib.
+* tox.ini: test Python 3.3 with monkey-patching, see eventlet bug:
+  https://github.com/eventlet/eventlet/pull/168
 
 
 eventlet issues
@@ -47,23 +49,29 @@ eventlet issues
   available on Windows.
 
 
+.. _eventlet-py3:
+
 eventlet and Python 3
 =====================
 
-Issues:
+eventlet 0.15 is the first release supporting Python 3. Python 3 is only
+supported if monkey-patching is not used.
 
-* https://github.com/eventlet/eventlet/issues/6 (root py3 issue)
-* https://github.com/eventlet/eventlet/issues/157 (py3 related?)
-* https://github.com/eventlet/eventlet/issues/153 (py3 related?)
+Python 3 pull requests:
 
-Pull requests:
+* Pull request #160: `Python 3 compat; Improve WSGI, WS, threading and tests
+  <https://github.com/eventlet/eventlet/pull/160>`_ (sent the Nov 5, 2014): not
+  merged yet
+* Pull request #99, `Fix several issues with python3 thread patching
+  <https://github.com/eventlet/eventlet/pull/99>`_ (sent the July 3, 2014): not
+  merged yet, see the `commit
+  <https://github.com/therve/eventlet/commit/9c3118162cf1ca1e50be330ba2a289f054c48d3c>`_
 
-* https://github.com/eventlet/eventlet/pull/99 : complete monkey-patching
-* => commit: https://github.com/therve/eventlet/commit/9c3118162cf1ca1e50be330ba2a289f054c48d3c
-* https://github.com/eventlet/eventlet/pull/160 (py3 related?)
+Python 3 issues:
 
-OpenStack Kilo Summit:
-
-* https://etherpad.openstack.org/p/kilo-oslo-python-3
-* https://etherpad.openstack.org/p/kilo-oslo-oslo.messaging
-* https://etherpad.openstack.org/p/py34-transition (tangentially related)
+* Issue #157: `eventlet hanging
+  <https://github.com/eventlet/eventlet/issues/157>`_ (open since Oct 30, 2014)
+* Issue #153: `py3: green.threading.local is not green
+  <https://github.com/eventlet/eventlet/issues/153>`_ (closed the Nov 5, 2014)
+* Issue #6: `Support Python 3.3
+  <https://github.com/eventlet/eventlet/issues/6>`_ (open since Jan 2013)
