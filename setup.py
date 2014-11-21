@@ -55,7 +55,7 @@ install_options = {
 
     "classifiers": [
         "Programming Language :: Python",
-        #"Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
     ],
 
