@@ -1,8 +1,6 @@
 To do
 =====
 
-* wrap_greenthread() must not log the exception to sys.stderr if the
-  greenthread didn't start
 * register signals in eventlet hub, only needed for pyevent hub?
 * port greenio examples to aiogreen
 * write unit tests for, and maybe also examples for:

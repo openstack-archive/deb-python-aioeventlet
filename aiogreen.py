@@ -240,31 +240,35 @@ class EventLoopPolicy(asyncio.DefaultEventLoopPolicy):
 def wrap_greenthread(gt, loop=None):
     """Wrap an eventlet GreenThread or a greenlet into a Future object.
 
-    The greenlet must not be running."""
+    The greenthread or greenlet must be wrapped before its execution starts.
+    If the greenthread or greenlet is running or already finished, an exception
+    is raised.
+    """
     if loop is None:
         loop = asyncio.get_event_loop()
     fut = asyncio.Future(loop=loop)
 
-    if isinstance(gt, eventlet.greenthread.GreenThread):
-        if loop.get_debug() and gt:
-            logger.warning("wrap_greenthread() called on "
-                           "a running greenthread")
+    if not isinstance(gt, greenlet.greenlet):
+        raise TypeError("greenthread or greenlet request, not %s"
+                        % type(gt))
 
-        def copy_result(gt):
+    if gt:
+        raise RuntimeError("wrap_greenthread: the greenthread is running")
+    if gt.dead:
+        raise RuntimeError("wrap_greenthread: the greenthread already finished")
+
+    if isinstance(gt, eventlet.greenthread.GreenThread):
+        orig_main = gt.run
+        def wrap_func(*args, **kw):
             try:
-                result = gt.wait()
+                orig_main(*args, **kw)
             except Exception as exc:
                 loop.call_soon(fut.set_exception, exc)
             else:
+                result = gt.wait()
                 loop.call_soon(fut.set_result, result)
-
-        gt.link(copy_result)
-    elif isinstance(gt, greenlet.greenlet):
-        if gt:
-            raise RuntimeError("cannot wrap a running greenlet")
-        if gt.dead:
-            raise RuntimeError("cannot wrap a greenlet which already finished")
-
+        gt.run = wrap_func
+    else:
         orig_func = gt.run
         def wrap_func(*args, **kw):
             try:
@@ -274,9 +278,6 @@ def wrap_greenthread(gt, loop=None):
             else:
                 loop.call_soon(fut.set_result, result)
         gt.run = wrap_func
-    else:
-        raise TypeError("greenthread or greenlet request, not %s"
-                        % type(gt))
     return fut
 
 

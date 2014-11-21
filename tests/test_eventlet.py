@@ -1,5 +1,6 @@
 import aiogreen
 import eventlet
+import sys
 import tests
 from tests import unittest
 
@@ -169,6 +170,21 @@ class EventletTests(tests.TestCase):
         self.loop.run_forever()
         self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
 
+    def test_set_debug(self):
+        hub = eventlet.hubs.get_hub()
+        self.assertIs(self.loop._hub, hub)
+
+        self.loop.set_debug(False)
+        self.assertEqual(hub.debug_exceptions, False)
+        self.assertEqual(hub.debug_blocking, False)
+
+        self.loop.set_debug(True)
+        self.assertEqual(hub.debug_exceptions, True)
+        if sys.platform != 'win32':
+            self.assertEqual(hub.debug_blocking, True)
+        else:
+            self.assertEqual(hub.debug_blocking, False)
+
 
 class WrapGreenthreadTests(tests.TestCase):
     def test_wrap_greenthread(self):
@@ -181,31 +197,29 @@ class WrapGreenthreadTests(tests.TestCase):
         result = self.loop.run_until_complete(fut)
         self.assertEqual(result, 'ok')
 
-    def test_wrap_greenthread_running(self):
-        event = eventlet.event.Event()
+    def test_wrap_greenthread_exc(self):
+        self.loop.set_debug(True)
 
+        def func():
+            raise ValueError(7)
+
+        # FIXME: the unit test must fail!?
+        with tests.mock.patch('traceback.print_exception') as print_exception:
+            gt = eventlet.spawn(func)
+            fut = aiogreen.wrap_greenthread(gt)
+            self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+        # the exception must not be logger by traceback: the caller must
+        # consume the exception from the future object
+        self.assertFalse(print_exception.called)
+
+    def test_wrap_greenthread_running(self):
         def func():
             return aiogreen.wrap_greenthread(gt)
 
         self.loop.set_debug(False)
         gt = eventlet.spawn(func)
-        fut1 = aiogreen.wrap_greenthread(gt)
-        fut2 = self.loop.run_until_complete(fut1)
-        fut3 = self.loop.run_until_complete(fut2)
-        self.assertIs(fut3, fut2)
-
-    @tests.mock.patch('aiogreen.logger')
-    def test_wrap_greenthread_running_log(self, m_log):
-        def func():
-            return aiogreen.wrap_greenthread(gt)
-
-        self.loop.set_debug(True)
-        gt = eventlet.spawn(func)
-        fut1 = aiogreen.wrap_greenthread(gt)
-        fut2 = self.loop.run_until_complete(fut1)
-        m_log.warning.assert_called_with("wrap_greenthread() called on "
-                                         "a running greenthread")
-
+        self.assertRaises(RuntimeError, gt.wait)
 
     def test_wrap_greenthread_dead(self):
         def func():
@@ -215,9 +229,7 @@ class WrapGreenthreadTests(tests.TestCase):
         result = gt.wait()
         self.assertEqual(result, 'ok')
 
-        fut = aiogreen.wrap_greenthread(gt)
-        result = self.loop.run_until_complete(fut)
-        self.assertEqual(result, 'ok')
+        self.assertRaises(RuntimeError, aiogreen.wrap_greenthread, gt)
 
     def test_coro_wrap_greenthread(self):
         result = self.loop.run_until_complete(coro_wrap_greenthread())
@@ -241,10 +253,21 @@ class WrapGreenletTests(tests.TestCase):
         def func():
             eventlet.sleep(0.010)
             return "ok"
+
         gt = eventlet.spawn_n(func)
         fut = aiogreen.wrap_greenthread(gt)
         result = self.loop.run_until_complete(fut)
         self.assertEqual(result, "ok")
+
+    def test_wrap_greenlet_exc(self):
+        self.loop.set_debug(True)
+
+        def func():
+            raise ValueError(7)
+
+        gt = eventlet.spawn_n(func)
+        fut = aiogreen.wrap_greenthread(gt)
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
 
     def test_wrap_greenlet_running(self):
         event = eventlet.event.Event()
@@ -265,9 +288,9 @@ class WrapGreenletTests(tests.TestCase):
         event = eventlet.event.Event()
         def func():
             event.send('done')
+
         gt = eventlet.spawn_n(func)
         event.wait()
-
         self.assertRaises(RuntimeError, aiogreen.wrap_greenthread, gt)
 
 
