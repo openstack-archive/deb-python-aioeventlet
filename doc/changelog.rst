@@ -4,10 +4,12 @@ Changelog
 Version 0.2 (development version)
 ---------------------------------
 
-The core of the event loop was rewritten to fits better in asyncio and
-eventlet. aiogreen now reuses more code from asyncio/trollius. The code
-handling file descriptors was also fixed to respect asyncio contract:
-only call the callback once per loop iteration.
+aiogreen event loop has been rewritten to reuse more asyncio/trollius code. It
+now only has a few specific code.
+
+All asyncio network are supported: TCP, UCP and UNIX clients and servers.
+
+Support of pipes, signal handlers and subprocess is still experimental.
 
 Changes:
 
