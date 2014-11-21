@@ -68,6 +68,24 @@ class _TpoolExecutor(object):
         self._tpool.killall()
 
 
+def wrap_greenthread(gt, loop=None):
+    """Wrap an eventlet greenthread into a Future object."""
+    if loop is None:
+        loop = asyncio.get_event_loop()
+    fut = asyncio.Future(loop=loop)
+
+    def copy_result(gt):
+        try:
+            value = gt.wait()
+        except Exception as exc:
+            loop.call_soon(fut.set_exception, exc)
+        else:
+            loop.call_soon(fut.set_result, value)
+
+    gt.link(copy_result)
+    return fut
+
+
 class _Selector(asyncio.selectors._BaseSelectorImpl):
     def __init__(self, loop, hub):
         super(_Selector, self).__init__()
