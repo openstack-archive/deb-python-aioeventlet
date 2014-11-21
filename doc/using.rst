@@ -88,6 +88,9 @@ aiogreen specific functions:
    aiogreen API is not stable yet. Function names may change in future
    releases, functions may change completly or even be removed.
 
+link_future
+-----------
+
 .. function:: link_future(future)
 
    Wait for a future (or a task) from a greenthread.
@@ -95,6 +98,11 @@ aiogreen specific functions:
 
    The function must not be called from the greenthread of the aiogreen event
    loop.
+
+   .. versionchanged:: 0.3
+
+     :func:`link_future` now raises an exception if it is called from the
+     greenthread of the aiogreen event loop.
 
    Example of greenthread waiting for a trollius task. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
@@ -136,6 +144,9 @@ aiogreen specific functions:
         computation in progress...
         1 + 2 = 3
 
+wrap_greenthread
+----------------
+
 .. function:: wrap_greenthread(gt)
 
    Wrap an eventlet GreenThread or a greenlet into a Future object.
@@ -145,6 +156,12 @@ aiogreen specific functions:
    The greenthread or greenlet must be wrapped before its execution starts.
    If the greenthread or greenlet is running or already finished, an exception
    is raised.
+
+   .. versionchanged:: 0.3
+
+     :func:`wrap_greenthread` now raises an exception if the greenthread is
+     running or already finished. In debug mode, the exception is not more logged
+     to sys.stderr for greenthreads.
 
    Example of trollius coroutine waiting for a greenthread. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
