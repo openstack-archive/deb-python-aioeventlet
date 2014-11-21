@@ -111,12 +111,13 @@ aiogreen specific functions:
             raise Return(x + y)
 
         def green_sum():
-            task = asyncio.async(coro_slow_sum(1, 2))
-
             loop.call_soon(progress)
+
+            task = asyncio.async(coro_slow_sum(1, 2))
 
             value = aiogreen.link_future(task)
             print("1 + 2 = %s" % value)
+
             loop.stop()
 
         asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
@@ -138,11 +139,9 @@ aiogreen specific functions:
 
    The Future object waits for the completion of a greenthread.
 
-   The greenlet must not be running.
-
-   In debug mode, if the greenthread raises an exception, the exception is
-   logged to ``sys.stderr`` by eventlet, even if the exception is copied to the
-   Future object.
+   The greenthread or greenlet must be wrapped before its execution starts.
+   If the greenthread or greenlet is running or already finished, an exception
+   is raised.
 
    Example of trollius coroutine waiting for a greenthread. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
@@ -162,11 +161,11 @@ aiogreen specific functions:
 
         @asyncio.coroutine
         def coro_sum():
-            gt = eventlet.spawn(slow_sum, 1, 2)
-
             loop.call_soon(progress)
 
+            gt = eventlet.spawn(slow_sum, 1, 2)
             fut = aiogreen.wrap_greenthread(gt, loop=loop)
+
             result = yield From(fut)
             print("1 + 2 = %s" % result)
 
