@@ -168,6 +168,8 @@ Changes:
   a new handle
 * In debug mode, detect calls to call_soon() from greenthreads which are not
   threadsafe (would not wake up the event loop).
+* Only set "debug_exceptions" of the eventlet hub when the debug mode of the
+  event loop is enabled.
 
 2014-11-19: version 0.1
 -----------------------
