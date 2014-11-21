@@ -5,7 +5,6 @@ To do
 * port greenio examples to aiogreen
 * write unit tests for, and maybe also examples for:
 
-  - wait_greenthread() + spawn_n
   - TCP server
   - UDP socket
   - UNIX socket
