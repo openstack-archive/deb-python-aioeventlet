@@ -68,24 +68,6 @@ class _TpoolExecutor(object):
         self._tpool.killall()
 
 
-def wrap_greenthread(gt, loop=None):
-    """Wrap an eventlet greenthread into a Future object."""
-    if loop is None:
-        loop = asyncio.get_event_loop()
-    fut = asyncio.Future(loop=loop)
-
-    def copy_result(gt):
-        try:
-            value = gt.wait()
-        except Exception as exc:
-            loop.call_soon(fut.set_exception, exc)
-        else:
-            loop.call_soon(fut.set_result, value)
-
-    gt.link(copy_result)
-    return fut
-
-
 class _Selector(asyncio.selectors._BaseSelectorImpl):
     def __init__(self, loop, hub):
         super(_Selector, self).__init__()
@@ -240,3 +222,40 @@ class EventLoop(asyncio.SelectorEventLoop):
 
 class EventLoopPolicy(asyncio.DefaultEventLoopPolicy):
     _loop_factory = EventLoop
+
+
+def wrap_greenthread(gt, loop=None):
+    """Wrap an eventlet greenthread into a Future object."""
+    if loop is None:
+        loop = asyncio.get_event_loop()
+    fut = asyncio.Future(loop=loop)
+
+    def copy_result(gt):
+        try:
+            value = gt.wait()
+        except Exception as exc:
+            loop.call_soon(fut.set_exception, exc)
+        else:
+            loop.call_soon(fut.set_result, value)
+
+    gt.link(copy_result)
+    return fut
+
+
+def link_future(future):
+    """Wait for a future.
+
+    Wait for a future or a task from a greenthread.
+    Return the result or raise the exception of the future.
+    """
+    event = eventlet.event.Event()
+    def done(fut):
+        try:
+            result = fut.result()
+        except Exception as exc:
+            event.send_exception(exc)
+        else:
+            event.send(result)
+
+    future.add_done_callback(done)
+    return event.wait()

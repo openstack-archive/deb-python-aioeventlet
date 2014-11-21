@@ -131,33 +131,19 @@ except ImportError:
         raise ValueError("error")
 
 
-def link_task(task):
-    event = eventlet.event.Event()
-    def done(fut):
-        try:
-            result = fut.result()
-        except Exception as exc:
-            # FIXME
-            event.send_exception(exc)
-        else:
-            event.send(result)
-
-    task.add_done_callback(done)
-    return event.wait()
-
-def greenthread_link_task(result, loop):
+def greenthread_link_future(result, loop):
     try:
         t1 = asyncio.async(coro_slow_append(result, 1, 0.2), loop=loop)
-        value = link_task(t1)
+        value = aiogreen.link_future(t1)
         result.append(value)
 
         t2 = asyncio.async(coro_slow_append(result, 2, 0.1), loop=loop)
-        value = link_task(t2)
+        value = aiogreen.link_future(t2)
         result.append(value)
 
         t3 = asyncio.async(coro_slow_error(0.001), loop=loop)
         try:
-            value = link_task(t3)
+            value = aiogreen.link_future(t3)
         except ValueError as exc:
             result.append(str(exc))
 
@@ -216,10 +202,10 @@ class EventletTests(tests.TestCase):
         result = self.loop.run_until_complete(coro_wrap_greenthread())
         self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
 
-    def test_greenthread_link_task(self):
+    def test_greenthread_link_future(self):
         result = []
         self.loop.call_soon(eventlet.spawn,
-                            greenthread_link_task, result, self.loop)
+                            greenthread_link_future, result, self.loop)
         self.loop.run_forever()
         self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
 
