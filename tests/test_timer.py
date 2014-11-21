@@ -31,9 +31,9 @@ class TimerTests(tests.TestCase):
             result.append("World")
             loop.stop()
 
-        self.loop.call_later(0.5, hello)
-        self.loop.call_later(1.0, self.loop.stop)
-        self.loop.call_later(1.5, world, self.loop)
+        self.loop.call_later(0.050, hello)
+        self.loop.call_later(0.100, self.loop.stop)
+        self.loop.call_later(0.150, world, self.loop)
         self.loop.run_forever()
 
         eventlet.sleep(0.200)
