@@ -201,22 +201,20 @@ class EventLoop(asyncio.SelectorEventLoop):
             self._default_executor = _TpoolExecutor(self)
 
     def call_soon(self, callback, *args):
+        handle = super(EventLoop, self).call_soon(callback, *args)
         if self._selector._event:
-            # selector.select() is running: use the thread-safe version to wake
-            # up select().
-            return self.call_soon_threadsafe(callback, *args)
-        else:
-            # Fast-path: no need to wake up th eevent loop.
-            return super(EventLoop, self).call_soon(callback, *args)
+            # selector.select() is running: write into the self-pipe to wake up
+            # the selector
+            self._write_to_self()
+        return handle
 
     def call_at(self, when, callback, *args):
+        handle = super(EventLoop, self).call_at(when, callback, *args)
         if self._selector._event:
-            # selector.select() is running: use the thread-safe version to wake
-            # up select().
-            return self.call_soon_threadsafe(super(EventLoop, self).call_at, when, callback, *args)
-        else:
-            # Fast-path: no need to wake up th eevent loop.
-            return super(EventLoop, self).call_at(when, callback, *args)
+            # selector.select() is running: write into the self-pipe to wake up
+            # the selector
+            self._write_to_self()
+        return handle
 
     def set_debug(self, debug):
         super(EventLoop, self).set_debug(debug)
