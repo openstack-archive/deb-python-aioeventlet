@@ -1,4 +1,3 @@
-import eventlet
 import tests
 
 class CallbackTests(tests.TestCase):
