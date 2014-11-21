@@ -4,7 +4,17 @@ To do
 * wrap_greenthread() must not log the exception to sys.stderr if the
   greenthread didn't start
 * register signals in eventlet hub, only needed for pyevent hub?
-* write tests for: pipes, signals and subprocesses
+* port greenio examples to aiogreen
+* write unit tests for, and maybe also examples for:
+
+  - wait_greenthread() + spawn_n
+  - TCP server
+  - UDP socket
+  - UNIX socket
+  - pipes
+  - signals
+  - subprocesses
+
 * run an event loop in a thread different than the main thread
 * tox.ini: test Python 3.3 with monkey-patching, see eventlet bug:
   https://github.com/eventlet/eventlet/pull/168
