@@ -14,15 +14,22 @@ greenthread with aiogreen. It means that it's possible to call
 ``run_forever()`` in the main thread and execute other greenthreads in
 parallel.
 
+aiogreen:
+
 * `aiogreen documentation <http://aiogreen.readthedocs.org/>`_
-* `asyncio documentation <http://docs.python.org/dev/library/asyncio.html>`_
-* `trollus documentation <http://trollius.readthedocs.org/>`_
 * `aiogreen project in the Python Cheeseshop (PyPI)
   <https://pypi.python.org/pypi/aiogreen>`_
 * `aiogreen project at Bitbucket <https://bitbucket.org/haypo/aiogreen>`_
 * Copyright/license: Open source, Apache 2.0. Enjoy!
 
-See also the `Tulip project <http://code.google.com/p/tulip/>`_.
+Event loops:
+
+* `asyncio documentation <http://docs.python.org/dev/library/asyncio.html>`_
+* `trollus documentation <http://trollius.readthedocs.org/>`_
+* `eventlet documentation <http://eventlet.net/doc/>`_
+* `eventlet project <http://eventlet.net/>`_
+* `greenlet documentation <http://greenlet.readthedocs.org/>`_
+* `Tulip project <http://code.google.com/p/tulip/>`_
 
 
 Usage
