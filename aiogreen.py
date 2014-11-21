@@ -189,6 +189,24 @@ class EventLoop(asyncio.SelectorEventLoop):
         if eventlet.patcher.is_monkey_patched('thread'):
             self._default_executor = _TpoolExecutor(self)
 
+    def call_soon(self, callback, *args):
+        if self._selector._event:
+            # selector.select() is running: use the thread-safe version to wake
+            # up select().
+            return self.call_soon_threadsafe(callback, *args)
+        else:
+            # Fast-path: no need to wake up th eevent loop.
+            return super(EventLoop, self).call_soon(callback, *args)
+
+    def call_at(self, when, callback, *args):
+        if self._selector._event:
+            # selector.select() is running: use the thread-safe version to wake
+            # up select().
+            return self.call_soon_threadsafe(super(EventLoop, self).call_at, when, callback, *args)
+        else:
+            # Fast-path: no need to wake up th eevent loop.
+            return super(EventLoop, self).call_at(when, callback, *args)
+
     def set_debug(self, debug):
         super(EventLoop, self).set_debug(debug)
 
@@ -200,14 +218,6 @@ class EventLoop(asyncio.SelectorEventLoop):
 
     def time(self):
         return self._hub.clock()
-
-    def _assert_is_current_event_loop(self):
-        super(EventLoop, self)._assert_is_current_event_loop()
-        if self._selector._event:
-            # call_soon() must not be called while selector.select() is
-            # running, it does not wake up the event loop
-            raise RuntimeError(
-                "Non-thread-safe operation invoked from a greenthread")
 
 
 class EventLoopPolicy(asyncio.DefaultEventLoopPolicy):

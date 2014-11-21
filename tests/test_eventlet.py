@@ -24,9 +24,9 @@ try:
                 try:
                     value = gt.wait()
                 except Exception as exc:
-                    loop.call_soon_threadsafe(fut.set_exception, exc)
+                    loop.call_soon(fut.set_exception, exc)
                 else:
-                    loop.call_soon_threadsafe(fut.set_result, value)
+                    loop.call_soon(fut.set_result, value)
             gt.link(copy_result)
 
             value = yield from fut
@@ -69,9 +69,9 @@ except ImportError:
             try:
                 value = gt.wait()
             except Exception as exc:
-                loop.call_soon_threadsafe(fut.set_exception, exc)
+                loop.call_soon(fut.set_exception, exc)
             else:
-                loop.call_soon_threadsafe(fut.set_result, value)
+                loop.call_soon(fut.set_result, value)
         gt.link(copy_result)
 
         value = yield From(fut)
@@ -104,7 +104,7 @@ except ImportError:
 class EventletTests(tests.TestCase):
     def test_stop(self):
         def func():
-            eventlet.spawn(self.loop.call_soon_threadsafe, self.loop.stop)
+            eventlet.spawn(self.loop.call_soon, self.loop.stop)
 
         def schedule_greenthread():
             eventlet.spawn(func)
@@ -117,7 +117,7 @@ class EventletTests(tests.TestCase):
 
         def func():
             result.append("spawn")
-            self.loop.call_soon_threadsafe(self.loop.stop)
+            self.loop.call_soon(self.loop.stop)
 
         def schedule_greenthread():
             eventlet.spawn(func)
@@ -134,7 +134,7 @@ class EventletTests(tests.TestCase):
 
         def func2():
             result.append("spawn_after")
-            self.loop.call_soon_threadsafe(self.loop.stop)
+            self.loop.call_soon(self.loop.stop)
 
         def schedule_greenthread():
             eventlet.spawn(func1)

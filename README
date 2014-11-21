@@ -72,15 +72,6 @@ Hello World::
     loop.close()
 
 
-Eventlet and aiogreen
----------------------
-
-Using the event loop from greenthreads is not safe: calls to the event loop
-must be passed to ``call_soon_threadsafe()``. Example to stop the event loop:
-
-    eventlet.spawn(loop.call_soon_threadsafe, loop.stop)
-
-
 Installation
 ============
 
