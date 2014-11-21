@@ -1,8 +1,11 @@
 import eventlet.hubs.hub
 import greenlet
+import logging
 import sys
 socket = eventlet.patcher.original('socket')
 threading = eventlet.patcher.original('threading')
+
+logger = logging.getLogger('aiogreen')
 
 try:
     import asyncio
@@ -243,6 +246,10 @@ def wrap_greenthread(gt, loop=None):
     fut = asyncio.Future(loop=loop)
 
     if isinstance(gt, eventlet.greenthread.GreenThread):
+        if loop.get_debug() and gt:
+            logger.warning("wrap_greenthread() called on "
+                           "a running greenthread")
+
         def copy_result(gt):
             try:
                 result = gt.wait()

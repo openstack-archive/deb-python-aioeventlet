@@ -187,11 +187,25 @@ class WrapGreenthreadTests(tests.TestCase):
         def func():
             return aiogreen.wrap_greenthread(gt)
 
+        self.loop.set_debug(False)
         gt = eventlet.spawn(func)
         fut1 = aiogreen.wrap_greenthread(gt)
         fut2 = self.loop.run_until_complete(fut1)
         fut3 = self.loop.run_until_complete(fut2)
         self.assertIs(fut3, fut2)
+
+    @tests.mock.patch('aiogreen.logger')
+    def test_wrap_greenthread_running_log(self, m_log):
+        def func():
+            return aiogreen.wrap_greenthread(gt)
+
+        self.loop.set_debug(True)
+        gt = eventlet.spawn(func)
+        fut1 = aiogreen.wrap_greenthread(gt)
+        fut2 = self.loop.run_until_complete(fut1)
+        m_log.warning.assert_called_with("wrap_greenthread() called on "
+                                         "a running greenthread")
+
 
     def test_wrap_greenthread_dead(self):
         def func():
@@ -218,6 +232,7 @@ class WrapGreenthreadTests(tests.TestCase):
         def coro_func():
             pass
         coro_obj = coro_func()
+        self.addCleanup(coro_obj.close)
         self.assertRaises(TypeError, aiogreen.wrap_greenthread, coro_obj)
 
 

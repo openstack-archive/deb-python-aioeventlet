@@ -1,8 +1,6 @@
 To do
 =====
 
-* doesn't make sense to call wrap_greenthread() from the running greenthread?
-  (it works for greenthreads, but it doesn't work for greenlets)
 * wrap_greenthread() must not log the exception to sys.stderr if the
   greenthread didn't start
 * register signals in eventlet hub, only needed for pyevent hub?
