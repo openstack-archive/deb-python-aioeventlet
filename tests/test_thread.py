@@ -1,8 +1,6 @@
-import aiogreen
 import eventlet
 import tests
 threading = eventlet.patcher.original('threading')
-time = eventlet.patcher.original('time')
 try:
     import asyncio
 except ImportError:
