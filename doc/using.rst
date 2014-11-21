@@ -84,6 +84,10 @@ API
 
 aiogreen specific functions:
 
+.. warning::
+   aiogreen API is not stable yet. Function names may change in future
+   releases, functions may change completly or even be removed.
+
 .. function:: link_future(future)
 
    Wait for a future (or a task) from a greenthread.

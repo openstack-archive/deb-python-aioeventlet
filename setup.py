@@ -51,7 +51,7 @@ install_options = {
 
     "description": "asyncio event loop scheduling callbacks in eventlet.",
     "long_description": long_description,
-    "url": "https://bitbucket.org/haypo/aiogreen/",
+    "url": "http://aiogreen.readthedocs.org/",
 
     "classifiers": [
         "Programming Language :: Python",
