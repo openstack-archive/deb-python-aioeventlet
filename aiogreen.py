@@ -191,6 +191,8 @@ class _Selector(asyncio.selectors._BaseSelectorImpl):
 
 class EventLoop(asyncio.SelectorEventLoop):
     def __init__(self):
+        self._greenthread = None
+
         # Store a reference to the hub to ensure
         # that we always use the same hub
         self._hub = eventlet.hubs.get_hub()
@@ -234,6 +236,7 @@ class EventLoop(asyncio.SelectorEventLoop):
             self._hub.debug_blocking_resolution = self.slow_callback_duration
 
     def run_forever(self):
+        self._greenthread = eventlet.getcurrent()
         try:
             super(EventLoop, self).run_forever()
         finally:
@@ -241,6 +244,7 @@ class EventLoop(asyncio.SelectorEventLoop):
                 # eventlet event loop is still running: cancel the current
                 # detection of blocking tasks
                 signal.alarm(0)
+            self._greenthread = None
 
     def time(self):
         return self._hub.clock()
@@ -299,7 +303,14 @@ def link_future(future):
 
     Wait for a future or a task from a greenthread.
     Return the result or raise the exception of the future.
+
+    The function must not be called from the greenthread
+    of the aiogreen event loop.
     """
+    if future._loop._greenthread == eventlet.getcurrent():
+        raise RuntimeError("link_future() must not be called from "
+                           "the greenthread of the aiogreen event loop")
+
     event = eventlet.event.Event()
     def done(fut):
         try:

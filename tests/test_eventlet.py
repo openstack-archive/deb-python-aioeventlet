@@ -163,13 +163,6 @@ class EventletTests(tests.TestCase):
         self.loop.run_forever()
         self.assertEqual(result, ["spawn", "spawn_after"])
 
-    def test_greenthread_link_future(self):
-        result = []
-        self.loop.call_soon(eventlet.spawn,
-                            greenthread_link_future, result, self.loop)
-        self.loop.run_forever()
-        self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
-
     def test_set_debug(self):
         hub = eventlet.hubs.get_hub()
         self.assertIs(self.loop._hub, hub)
@@ -184,6 +177,51 @@ class EventletTests(tests.TestCase):
             self.assertEqual(hub.debug_blocking, True)
         else:
             self.assertEqual(hub.debug_blocking, False)
+
+
+class LinkFutureTests(tests.TestCase):
+    def test_greenthread_link_future(self):
+        result = []
+        self.loop.call_soon(eventlet.spawn,
+                            greenthread_link_future, result, self.loop)
+        self.loop.run_forever()
+        self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
+
+    def test_link_future_not_running(self):
+        result = []
+        fut = asyncio.Future(loop=self.loop)
+        event = eventlet.event.Event()
+
+        def func(event, fut):
+            event.send('link')
+            value = aiogreen.link_future(fut)
+            result.append(value)
+            self.loop.stop()
+
+        eventlet.spawn(func, event, fut)
+        event.wait()
+
+        self.loop.call_soon(fut.set_result, 21)
+        self.loop.run_forever()
+        self.assertEqual(result, [21])
+
+    def test_link_future_from_loop(self):
+        result = []
+
+        def func(fut):
+            try:
+                value = aiogreen.link_future(fut)
+            except Exception as exc:
+                result.append('error')
+            else:
+                result.append(value)
+            self.loop.stop()
+
+        fut = asyncio.Future(loop=self.loop)
+        self.loop.call_soon(func, fut)
+        self.loop.call_soon(fut.set_result, 'unused')
+        self.loop.run_forever()
+        self.assertEqual(result, ['error'])
 
 
 class WrapGreenthreadTests(tests.TestCase):

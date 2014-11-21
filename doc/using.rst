@@ -93,6 +93,9 @@ aiogreen specific functions:
    Wait for a future (or a task) from a greenthread.
    Return the result or raise the exception of the future.
 
+   The function must not be called from the greenthread of the aiogreen event
+   loop.
+
    Example of greenthread waiting for a trollius task. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
 
