@@ -1,4 +1,4 @@
-asyncio event loop scheduling callbacks in eventlet.
+asyncio event loop implemented on top of eventlet.
 
 * Trollius project: http://trollius.readthedocs.org/
 * aiogreen at PyPI: https://pypi.python.org/pypi/aiogreen
@@ -7,12 +7,73 @@ asyncio event loop scheduling callbacks in eventlet.
 Usage
 =====
 
+Use aiogreen with asyncio
+-------------------------
+
 aiogreen implements the asyncio API, see asyncio documentation:
 https://docs.python.org/dev/library/asyncio.html
+
+To use aiogreen with asyncio, set the event loop policy before using an event
+loop, example::
+
+    import aiogreen
+    import asyncio
+
+    asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
+    # ....
+
+Adding this code should be enough to try examples of the asyncio documentation.
+
+Hello World::
+
+    import aiogreen
+    import asyncio
+
+    def hello_world():
+        print("Hello World")
+        loop.stop()
+
+    asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
+    loop = asyncio.get_event_loop()
+    loop.call_soon(hello_world)
+    loop.run_forever()
+    loop.close()
+
+
+Use aiogreen with trollius
+-------------------------
 
 To support Python 2, you can use Trollius which uses ``yield`` instead
 of ``yield from`` for coroutines:
 http://trollius.readthedocs.org/
+
+To use aiogreen with trollius, set the event loop policy before using an event
+loop, example::
+
+    import aiogreen
+    import trollius
+
+    trollius.set_event_loop_policy(aiogreen.EventLoopPolicy())
+    # ....
+
+Hello World::
+
+    import aiogreen
+    import trollius as asyncio
+
+    def hello_world():
+        print("Hello World")
+        loop.stop()
+
+    asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
+    loop = asyncio.get_event_loop()
+    loop.call_soon(hello_world)
+    loop.run_forever()
+    loop.close()
+
+
+Eventlet and aiogreen
+---------------------
 
 Using the event loop from greenthreads is not safe: calls to the event loop
 must be passed to ``call_soon_threadsafe()``. Example to stop the event loop:
