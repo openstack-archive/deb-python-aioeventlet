@@ -300,15 +300,15 @@ def wrap_greenthread(gt, loop=None):
     return fut
 
 
-def link_future(future):
-    """Wait for a future.
+def link_future(future, loop=None):
+    """Wait for a future, a task, or a coroutine from a greenthread.
 
-    Wait for a future or a task from a greenthread.
     Return the result or raise the exception of the future.
 
     The function must not be called from the greenthread
     of the aiogreen event loop.
     """
+    future = asyncio.async(future, loop=loop)
     if future._loop._greenthread == eventlet.getcurrent():
         raise RuntimeError("link_future() must not be called from "
                            "the greenthread of the aiogreen event loop")

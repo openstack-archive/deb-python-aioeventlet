@@ -90,9 +90,9 @@ aiogreen specific functions:
 link_future
 -----------
 
-.. function:: link_future(future)
+.. function:: link_future(future, loop=None)
 
-   Wait for a future, or a task, from a greenthread.
+   Wait for a future, a task, or a coroutine from a greenthread.
 
    Return the result or raise the exception of the future.
 
@@ -101,8 +101,9 @@ link_future
 
    .. versionchanged:: 0.3
 
-     An exception is now raised if it is called from the greenthread of the
-     aiogreen event loop.
+      Coroutine objects are also accepted. Added the *loop* parameter.
+      An exception is raised if it is called from the greenthread of the
+      aiogreen event loop.
 
    Example of greenthread waiting for a trollius task. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
