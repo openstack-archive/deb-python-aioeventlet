@@ -22,23 +22,18 @@ try:
         @asyncio.coroutine
         def coro_wrap_greenthread():
             result = []
-            loop = asyncio.get_event_loop()
 
-            g1 = eventlet.spawn(eventlet_slow_append, result, 1, 0.020)
-
-            fut = aiogreen.wrap_greenthread(g1, loop=loop)
-            value = yield from fut
+            gt = eventlet.spawn(eventlet_slow_append, result, 1, 0.020)
+            value = yield from aiogreen.wrap_greenthread(gt)
             result.append(value)
 
-            g2 = eventlet.spawn(eventlet_slow_append, result, 2, 0.010)
-            fut = aiogreen.wrap_greenthread(g2, loop=loop)
-            value = yield from fut
+            gt = eventlet.spawn(eventlet_slow_append, result, 2, 0.010)
+            value = yield from aiogreen.wrap_greenthread(gt)
             result.append(value)
 
-            g3 = eventlet.spawn(eventlet_slow_error)
-            fut = aiogreen.wrap_greenthread(g3, loop=loop)
+            gt = eventlet.spawn(eventlet_slow_error)
             try:
-                yield from fut
+                yield from aiogreen.wrap_greenthread(gt)
             except ValueError as exc:
                 result.append(str(exc))
 
@@ -63,22 +58,18 @@ except ImportError:
     @asyncio.coroutine
     def coro_wrap_greenthread():
         result = []
-        loop = asyncio.get_event_loop()
 
-        g1 = eventlet.spawn(eventlet_slow_append, result, 1, 0.020)
-        fut = aiogreen.wrap_greenthread(g1, loop=loop)
-        value = yield From(fut)
+        gt = eventlet.spawn(eventlet_slow_append, result, 1, 0.020)
+        value = yield From(aiogreen.wrap_greenthread(gt))
         result.append(value)
 
-        g2 = eventlet.spawn(eventlet_slow_append, result, 2, 0.010)
-        fut = aiogreen.wrap_greenthread(g2, loop=loop)
-        value = yield From(fut)
+        gt = eventlet.spawn(eventlet_slow_append, result, 2, 0.010)
+        value = yield From(aiogreen.wrap_greenthread(gt))
         result.append(value)
 
-        g3 = eventlet.spawn(eventlet_slow_error)
-        fut = aiogreen.wrap_greenthread(g3, loop=loop)
+        gt = eventlet.spawn(eventlet_slow_error)
         try:
-            yield From(fut)
+            yield From(aiogreen.wrap_greenthread(gt))
         except ValueError as exc:
             result.append(str(exc))
 
@@ -115,18 +106,15 @@ def greenthread_link_future(result, loop):
     except Exception as exc:
         result.append(repr(exc))
     finally:
-        loop.call_soon(loop.stop)
+        loop.stop()
 
 
 class EventletTests(tests.TestCase):
     def test_stop(self):
         def func():
-            eventlet.spawn(self.loop.call_soon, self.loop.stop)
+            self.loop.stop()
 
-        def schedule_greenthread():
-            eventlet.spawn(func)
-
-        self.loop.call_soon(schedule_greenthread)
+        eventlet.spawn(func)
         self.loop.run_forever()
 
     def test_soon(self):
@@ -134,12 +122,9 @@ class EventletTests(tests.TestCase):
 
         def func():
             result.append("spawn")
-            self.loop.call_soon(self.loop.stop)
+            self.loop.stop()
 
-        def schedule_greenthread():
-            eventlet.spawn(func)
-
-        self.loop.call_soon(schedule_greenthread)
+        eventlet.spawn(func)
         self.loop.run_forever()
         self.assertEqual(result, ["spawn"])
 
@@ -151,7 +136,7 @@ class EventletTests(tests.TestCase):
 
         def func2():
             result.append("spawn_after")
-            self.loop.call_soon(self.loop.stop)
+            self.loop.stop()
 
         def schedule_greenthread():
             eventlet.spawn(func1)
