@@ -79,6 +79,29 @@ Hello World::
    <https://docs.python.org/dev/library/asyncio.html>`_.
 
 
+Debug mode
+----------
+
+To enable the debug mode globally when using trollius, set the environment
+variable ``TROLLIUSDEBUG`` to ``1``. To see debug traces, set the log level of
+the trollius logger to ``logging.DEBUG``.  The simplest configuration is::
+
+   import logging
+   # ...
+   logging.basicConfig(level=logging.DEBUG)
+
+If you use asyncio,  use the ``PYTHONASYNCIODEBUG`` environment variable
+instead of the ``TROLLIUSDEBUG`` variable.
+
+You can also call ``loop.set_debug(True)`` to enable the debug mode of the
+event loop, but it enables less debug checks.
+
+.. seealso::
+   Read the `Develop with asyncio
+   <https://docs.python.org/dev/library/asyncio-dev.html>`_ section of the
+   asyncio documentation.
+
+
 API
 ===
 
