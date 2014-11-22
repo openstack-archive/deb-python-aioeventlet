@@ -98,17 +98,14 @@ except ImportError:
 
 def greenthread_link_future(result, loop):
     try:
-        t1 = asyncio.async(coro_slow_append(result, 1, 0.2), loop=loop)
-        value = aiogreen.link_future(t1)
+        value = aiogreen.link_future(coro_slow_append(result, 1, 0.020))
         result.append(value)
 
-        t2 = asyncio.async(coro_slow_append(result, 2, 0.1), loop=loop)
-        value = aiogreen.link_future(t2)
+        value = aiogreen.link_future(coro_slow_append(result, 2, 0.010))
         result.append(value)
 
-        t3 = asyncio.async(coro_slow_error(0.001), loop=loop)
         try:
-            value = aiogreen.link_future(t3)
+            value = aiogreen.link_future(coro_slow_error())
         except ValueError as exc:
             result.append(str(exc))
 
@@ -187,10 +184,21 @@ class LinkFutureTests(tests.TestCase):
         self.loop.run_forever()
         self.assertEqual(result, [1, 10, 2, 20, 'error', 4])
 
+    def test_link_coro(self):
+        result = []
+
+        def func(fut):
+            value = aiogreen.link_future(coro_slow_append(result, 3))
+            result.append(value)
+            self.loop.stop()
+
+        fut = asyncio.Future(loop=self.loop)
+        eventlet.spawn(func, fut)
+        self.loop.run_forever()
+        self.assertEqual(result, [3, 30])
+
     def test_link_future_not_running(self):
         result = []
-        fut = asyncio.Future(loop=self.loop)
-        event = eventlet.event.Event()
 
         def func(event, fut):
             event.send('link')
@@ -198,6 +206,8 @@ class LinkFutureTests(tests.TestCase):
             result.append(value)
             self.loop.stop()
 
+        event = eventlet.event.Event()
+        fut = asyncio.Future(loop=self.loop)
         eventlet.spawn(func, event, fut)
         event.wait()
 
@@ -222,6 +232,27 @@ class LinkFutureTests(tests.TestCase):
         self.loop.call_soon(fut.set_result, 'unused')
         self.loop.run_forever()
         self.assertEqual(result, ['error'])
+
+    def test_link_future_wrong_loop(self):
+        result = []
+        loop2 = asyncio.new_event_loop()
+        self.addCleanup(loop2.close)
+
+        def func(fut):
+            try:
+                value = aiogreen.link_future(fut, loop=loop2)
+            except Exception as exc:
+                result.append(str(exc))
+            else:
+                result.append(value)
+            self.loop.stop()
+
+        fut = asyncio.Future(loop=self.loop)
+        self.loop.call_soon(func, fut)
+        self.loop.call_soon(fut.set_result, 'unused')
+        self.loop.run_forever()
+        self.assertEqual(result[0],
+                         'loop argument must agree with Future')
 
 
 class WrapGreenthreadTests(tests.TestCase):
