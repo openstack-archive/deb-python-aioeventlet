@@ -134,13 +134,13 @@ New try with a greenio executor for Oslo Messaging:
   `A 'greenio' executor for oslo.messaging
   <https://blueprints.launchpad.net/oslo.messaging/+spec/greenio-executor>`_,
   approved by Mark McLoughlin.
-* Jul 24, 2014: `Add greenio dependency <https://review.openstack.org/108637>`_
+* July 24, 2014: `Add greenio dependency <https://review.openstack.org/108637>`_
   merged into openstack/requirements
-* Jul 22, 2014: Patch `Add a new greenio executor
+* July 22, 2014: Patch `Add a new greenio executor
   <https://review.openstack.org/#/c/108652/>`_ proposed to Oslo Messaging
 * July 21, 2014: Release of greenio 0.6 which is now compatible with Trollius
 * July 21, 2014: Release of Trollius 1.0
-* Jul 14, 2014: Patch `Add a 'greenio' oslo.messaging executor (spec)
+* July 14, 2014: Patch `Add a 'greenio' oslo.messaging executor (spec)
   <https://review.openstack.org/#/c/104792/>`_ merged into openstack/oslo-specs.
 * July 7, 2014: Patch `Fix AMQPListener for polling with timeout
   <https://review.openstack.org/#/c/104964/>`_ merged into Oslo Messaging
@@ -149,7 +149,7 @@ New try with a greenio executor for Oslo Messaging:
 
 First try with a trollius executor for Oslo Messaging:
 
-* Jun 20, 2014: Patch `Add an optional timeout parameter to Listener.poll
+* June 20, 2014: Patch `Add an optional timeout parameter to Listener.poll
   <https://review.openstack.org/#/c/71003/>`_ merged into Oslo Messaging
 * May 28, 2014: Meeting at OpenStack in action with Doug Hellman, Julien
   Danjou, Mehdi Abaakouk, Victor Stinner and Christophe to discuss the plan to
@@ -157,14 +157,14 @@ First try with a trollius executor for Oslo Messaging:
 * April 23, 2014: Patch `Allow trollius 0.2
   <https://review.openstack.org/#/c/79901/>`_ merged into
   openstack/requirements
-* Mar 21, 2014: Patch `Replace ad-hoc coroutines with Trollius coroutines
+* March 21, 2014: Patch `Replace ad-hoc coroutines with Trollius coroutines
   <https://review.openstack.org/#/c/77925/>`_ proposed to Heat. Heat coroutines
   are close to Trollius coroutines. Patch abandonned, need to be rewritten,
   maybe with aiogreen.
 * February 20, 2014: The full specification of the blueprint was written:
   `Oslo/blueprints/asyncio
   <https://wiki.openstack.org/wiki/Oslo/blueprints/asyncio>`_
-* Feb 8, 2014: Patch `Add a new dependency: trollius
+* February 8, 2014: Patch `Add a new dependency: trollius
   <https://review.openstack.org/#/c/70983/>`_ merged into
   openstack/requirements
 * February 27, 2014: Article `Use the new asyncio module and Trollius in OpenStack
