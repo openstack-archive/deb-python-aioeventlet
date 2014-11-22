@@ -115,7 +115,7 @@ link_future
 
 .. function:: link_future(future, loop=None)
 
-   Wait for a future, a task, or a coroutine from a greenthread.
+   Wait for a future, a task, or a coroutine object from a greenthread.
 
    Return the result or raise the exception of the future.
 
