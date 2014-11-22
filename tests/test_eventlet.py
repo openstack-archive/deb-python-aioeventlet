@@ -234,6 +234,23 @@ class LinkFutureTests(tests.TestCase):
         self.loop.run_forever()
         self.assertEqual(result, ['error'])
 
+    def test_link_future_invalid_type(self):
+        def func(obj):
+            return aiogreen.link_future(obj)
+
+        @asyncio.coroutine
+        def coro_func():
+            print("do something")
+
+        def regular_func():
+            return 3
+
+        for obj in (coro_func, regular_func):
+            gt = eventlet.spawn(func, coro_func)
+            # ignore logged traceback
+            with tests.mock.patch('traceback.print_exception') as m_print:
+                self.assertRaises(TypeError, gt.wait)
+
     def test_link_future_wrong_loop(self):
         result = []
         loop2 = asyncio.new_event_loop()
