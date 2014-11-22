@@ -255,11 +255,13 @@ class EventLoopPolicy(asyncio.DefaultEventLoopPolicy):
 
 
 def wrap_greenthread(gt, loop=None):
-    """Wrap an eventlet GreenThread or a greenlet into a Future object.
+    """Wrap an eventlet GreenThread, or a greenlet, into a Future object.
 
-    The greenthread or greenlet must be wrapped before its execution starts.
-    If the greenthread or greenlet is running or already finished, an exception
-    is raised.
+    The Future object waits for the completion of a greenthread. The result
+    or the exception of the greenthread will be stored in the Future object.
+
+    The greenthread must be wrapped before its execution starts. If the
+    greenthread is running or already finished, an exception is raised.
     """
     if loop is None:
         loop = asyncio.get_event_loop()

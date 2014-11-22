@@ -85,15 +85,15 @@ API
 aiogreen specific functions:
 
 .. warning::
-   aiogreen API is not stable yet. Function names may change in future
-   releases, functions may change completly or even be removed.
+   aiogreen API is not considered as stable yet.
 
 link_future
 -----------
 
 .. function:: link_future(future)
 
-   Wait for a future (or a task) from a greenthread.
+   Wait for a future, or a task, from a greenthread.
+
    Return the result or raise the exception of the future.
 
    The function must not be called from the greenthread of the aiogreen event
@@ -101,8 +101,8 @@ link_future
 
    .. versionchanged:: 0.3
 
-     :func:`link_future` now raises an exception if it is called from the
-     greenthread of the aiogreen event loop.
+     An exception is now raised if it is called from the greenthread of the
+     aiogreen event loop.
 
    Example of greenthread waiting for a trollius task. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
@@ -149,19 +149,19 @@ wrap_greenthread
 
 .. function:: wrap_greenthread(gt)
 
-   Wrap an eventlet GreenThread or a greenlet into a Future object.
+   Wrap an eventlet GreenThread, or a greenlet, into a Future object.
 
-   The Future object waits for the completion of a greenthread.
+   The Future object waits for the completion of a greenthread. The result or
+   the exception of the greenthread will be stored in the Future object.
 
-   The greenthread or greenlet must be wrapped before its execution starts.
-   If the greenthread or greenlet is running or already finished, an exception
-   is raised.
+   The greenthread must be wrapped before its execution starts.  If the
+   greenthread is running or already finished, an exception is raised.
 
    .. versionchanged:: 0.3
 
-     :func:`wrap_greenthread` now raises an exception if the greenthread is
-     running or already finished. In debug mode, the exception is not more logged
-     to sys.stderr for greenthreads.
+     An exception is now raised if the greenthread is running or already
+     finished. In debug mode, the exception is not more logged to sys.stderr
+     for greenthreads.
 
    Example of trollius coroutine waiting for a greenthread. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
@@ -255,7 +255,7 @@ Run tests
 Run tests with tox
 ------------------
 
-The `tox project <https://testrun.org/tox/latest/>`_ can be used to build a
+The `tox project <http://testrun.org/tox/latest/>`_ can be used to build a
 virtual environment with all runtime and test dependencies and run tests
 against different Python versions (2.6, 2.7, 3.2, 3.3, 3.4).
 
