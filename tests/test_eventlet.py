@@ -4,14 +4,15 @@ import sys
 import tests
 from tests import unittest
 
+SHORT_SLEEP = 0.001
 
 def eventlet_slow_append(result, value, delay):
     eventlet.sleep(delay)
     result.append(value)
     return value * 10
 
-def eventlet_slow_error(delay):
-    eventlet.sleep(delay)
+def eventlet_slow_error():
+    eventlet.sleep(SHORT_SLEEP)
     raise ValueError("error")
 
 try:
@@ -23,18 +24,18 @@ try:
             result = []
             loop = asyncio.get_event_loop()
 
-            g1 = eventlet.spawn(eventlet_slow_append, result, 1, 0.2)
+            g1 = eventlet.spawn(eventlet_slow_append, result, 1, 0.020)
 
             fut = aiogreen.wrap_greenthread(g1, loop=loop)
             value = yield from fut
             result.append(value)
 
-            g2 = eventlet.spawn(eventlet_slow_append, result, 2, 0.1)
+            g2 = eventlet.spawn(eventlet_slow_append, result, 2, 0.010)
             fut = aiogreen.wrap_greenthread(g2, loop=loop)
             value = yield from fut
             result.append(value)
 
-            g3 = eventlet.spawn(eventlet_slow_error, 0.001)
+            g3 = eventlet.spawn(eventlet_slow_error)
             fut = aiogreen.wrap_greenthread(g3, loop=loop)
             try:
                 yield from fut
@@ -45,14 +46,14 @@ try:
             return result
 
         @asyncio.coroutine
-        def coro_slow_append(result, value, delay):
+        def coro_slow_append(result, value, delay=SHORT_SLEEP):
             yield from asyncio.sleep(delay)
             result.append(value)
             return value * 10
 
         @asyncio.coroutine
-        def coro_slow_error(delay):
-            yield from asyncio.sleep(delay)
+        def coro_slow_error():
+            yield from asyncio.sleep(0.001)
             raise ValueError("error")
     ''')
 except ImportError:
@@ -64,17 +65,17 @@ except ImportError:
         result = []
         loop = asyncio.get_event_loop()
 
-        g1 = eventlet.spawn(eventlet_slow_append, result, 1, 0.2)
+        g1 = eventlet.spawn(eventlet_slow_append, result, 1, 0.020)
         fut = aiogreen.wrap_greenthread(g1, loop=loop)
         value = yield From(fut)
         result.append(value)
 
-        g2 = eventlet.spawn(eventlet_slow_append, result, 2, 0.1)
+        g2 = eventlet.spawn(eventlet_slow_append, result, 2, 0.010)
         fut = aiogreen.wrap_greenthread(g2, loop=loop)
         value = yield From(fut)
         result.append(value)
 
-        g3 = eventlet.spawn(eventlet_slow_error, 0.001)
+        g3 = eventlet.spawn(eventlet_slow_error)
         fut = aiogreen.wrap_greenthread(g3, loop=loop)
         try:
             yield From(fut)
@@ -85,14 +86,14 @@ except ImportError:
         raise Return(result)
 
     @asyncio.coroutine
-    def coro_slow_append(result, value, delay):
+    def coro_slow_append(result, value, delay=SHORT_SLEEP):
         yield From(asyncio.sleep(delay))
         result.append(value)
         raise Return(value * 10)
 
     @asyncio.coroutine
-    def coro_slow_error(delay):
-        yield From(asyncio.sleep(delay))
+    def coro_slow_error():
+        yield From(asyncio.sleep(0.001))
         raise ValueError("error")
 
 
