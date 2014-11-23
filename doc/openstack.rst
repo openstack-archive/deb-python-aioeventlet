@@ -5,7 +5,7 @@ First part (in progress): add support for trollius coroutines
 -------------------------------------------------------------
 
 Prepare OpenStack (Oslo Messaging) to support trollius coroutines using
-``yield``: explicit asynchrounous programming. Eventlet is still supported,
+``yield``: explicit asynchronous programming. Eventlet is still supported,
 used by default, and applications and libraries don't need to be modified at
 this point.
 
@@ -26,7 +26,7 @@ To do:
 Second part (to do): rewrite code as trollius coroutines
 --------------------------------------------------------
 
-Switch from implicit asynchrounous programming (eventlet using greenthreads) to
+Switch from implicit asynchronous programming (eventlet using greenthreads) to
 explicit asynchronous programming (trollius coroutines using ``yield``). Need
 to modify OpenStack Common Libraries and applications. Modifications can be
 done step by step, the switch will take more than 6 months.
