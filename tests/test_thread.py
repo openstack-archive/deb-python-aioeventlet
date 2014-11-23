@@ -87,13 +87,6 @@ class ThreadTests(tests.TestCase):
             result.append(threading.current_thread().ident)
             loop.stop()
 
-        # FIXME: call_soon() must raise an exception if if the main thread
-        # has no event loop, bugs.python.org/issue22926
-        #self.loop.close()
-        #asyncio.set_event_loop(None)
-        # call_soon() must fail when called from the wrong thread
-        self.assertRaises(RuntimeError, loop.call_soon, func, loop)
-
         # call func() in a different thread using the event loop
         tid = thread.ident
         loop.call_soon_threadsafe(func, loop)
