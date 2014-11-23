@@ -209,7 +209,7 @@ class EventLoop(asyncio.SelectorEventLoop):
 
     def call_soon(self, callback, *args):
         handle = super(EventLoop, self).call_soon(callback, *args)
-        if self._selector._event:
+        if self._selector is not None and self._selector._event:
             # selector.select() is running: write into the self-pipe to wake up
             # the selector
             self._write_to_self()
@@ -217,7 +217,7 @@ class EventLoop(asyncio.SelectorEventLoop):
 
     def call_at(self, when, callback, *args):
         handle = super(EventLoop, self).call_at(when, callback, *args)
-        if self._selector._event:
+        if self._selector is not None and self._selector._event:
             # selector.select() is running: write into the self-pipe to wake up
             # the selector
             self._write_to_self()
