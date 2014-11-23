@@ -79,6 +79,22 @@ Hello World::
    <https://docs.python.org/dev/library/asyncio.html>`_.
 
 
+Threads
+-------
+
+Running an event loop in a thread different than the main thread is currently
+experimental.
+
+An eventlet Event object is not thread-safe, it must only be used in the
+same thread. Use threading.Event to signal events between threads,
+and threading.Queue to pass data between threads.
+
+Use ``threading = eventlet.patcher.original('threading')`` to get the original
+threading instead of ``import threading``.
+
+It is not possible to run two aiogreen event loops in the same thread.
+
+
 Debug mode
 ----------
 

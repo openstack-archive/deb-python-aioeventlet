@@ -55,6 +55,53 @@ class ThreadTests(tests.TestCase):
         self.loop.run_until_complete(fut)
         self.assertIsInstance(result['loop'], AssertionError)
 
+    def test_run_in_thread(self):
+        class LoopThread(threading.Thread):
+            def __init__(self, event):
+                super(LoopThread, self).__init__()
+                self.loop = None
+                self.event = event
+
+            def run(self):
+                self.loop = asyncio.new_event_loop()
+                try:
+                    self.loop.set_debug(True)
+                    asyncio.set_event_loop(self.loop)
+
+                    self.event.set()
+                    self.loop.run_forever()
+                finally:
+                    self.loop.close()
+                    asyncio.set_event_loop(None)
+
+        result = []
+
+        # start an event loop in a thread
+        event = threading.Event()
+        thread = LoopThread(event)
+        thread.start()
+        event.wait()
+        loop = thread.loop
+
+        def func(loop):
+            result.append(threading.current_thread().ident)
+            loop.stop()
+
+        # FIXME: call_soon() must raise an exception if if the main thread
+        # has no event loop, bugs.python.org/issue22926
+        #self.loop.close()
+        #asyncio.set_event_loop(None)
+        # call_soon() must fail when called from the wrong thread
+        self.assertRaises(RuntimeError, loop.call_soon, func, loop)
+
+        # call func() in a different thread using the event loop
+        tid = thread.ident
+        loop.call_soon_threadsafe(func, loop)
+
+        # stop the event loop
+        thread.join()
+        self.assertEqual(result, [tid])
+
 
 if __name__ == '__main__':
     import unittest

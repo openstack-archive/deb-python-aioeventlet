@@ -12,6 +12,9 @@ Version 0.3 (development version)
   greenthread of the aiogreen event loop.
 * Fix eventlet detection of blocking tasks: cancel the alarm when the aiogreen
   event loop stops.
+* Fix to run an event loop in a thread different than the main thread in debug
+  mode: disable eventlet "debug_blocking", it is implemented with the SIGALRM
+  signal, but signal handlers can only be set in the main thread.
 
 2014-10-21: version 0.2
 -----------------------
