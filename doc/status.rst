@@ -12,7 +12,7 @@ To do
   - signals
   - subprocesses
 
-* run an event loop in a thread different than the main thread
+* experiment running an event loop in a thread different than the main thread
 * tox.ini: test Python 3.3 with monkey-patching, see eventlet bug:
   https://github.com/eventlet/eventlet/pull/168
 
