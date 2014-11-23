@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Version 0.3 (development version)
----------------------------------
+2014-10-23: version 0.3
+-----------------------
 
 * :func:`wrap_greenthread` now raises an exception if the greenthread is
   running or already finished. In debug mode, the exception is not more logged
