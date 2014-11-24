@@ -14,6 +14,21 @@ class WrapGreenletTests(tests.TestCase):
         result = self.loop.run_until_complete(fut)
         self.assertEqual(result, 15)
 
+    def test_wrap_greenlet_exc(self):
+        def func():
+            raise ValueError(7)
+
+        gl = greenlet.greenlet(func)
+        fut = aiogreen.wrap_greenthread(gl)
+        gl.switch()
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+    def test_wrap_greenlet_no_run_attr(self):
+        gl = greenlet.greenlet()
+        msg = "wrap_greenthread: the run attribute of the greenlet is not set"
+        self.assertRaisesRegexp(RuntimeError, msg,
+                                aiogreen.wrap_greenthread, gl)
+
     def test_wrap_greenlet_running(self):
         def func(value):
             gl = greenlet.getcurrent()
