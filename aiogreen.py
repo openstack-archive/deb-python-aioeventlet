@@ -269,6 +269,8 @@ def wrap_greenthread(gt, loop=None):
 
     The greenthread must be wrapped before its execution starts. If the
     greenthread is running or already finished, an exception is raised.
+
+    For greenlets, the run attribute must be set.
     """
     if loop is None:
         loop = asyncio.get_event_loop()
@@ -295,7 +297,11 @@ def wrap_greenthread(gt, loop=None):
                 fut.set_result(result)
         gt.run = wrap_func
     else:
-        orig_func = gt.run
+        try:
+            orig_func = gt.run
+        except AttributeError:
+            raise RuntimeError("wrap_greenthread: the run attribute "
+                               "of the greenlet is not set")
         def wrap_func(*args, **kw):
             try:
                 result = orig_func(*args, **kw)

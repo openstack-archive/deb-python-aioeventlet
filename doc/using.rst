@@ -197,6 +197,8 @@ wrap_greenthread
    The greenthread must be wrapped before its execution starts.  If the
    greenthread is running or already finished, an exception is raised.
 
+   For greenlets, the ``run`` attribute must be set.
+
    .. versionchanged:: 0.3
 
      An exception is now raised if the greenthread is running or already
