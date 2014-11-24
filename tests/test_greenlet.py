@@ -35,7 +35,8 @@ class WrapGreenletTests(tests.TestCase):
             return aiogreen.wrap_greenthread(gl)
 
         gl = greenlet.greenlet(func)
-        self.assertRaises(RuntimeError, gl.switch, 5)
+        msg = "wrap_greenthread: the greenthread is running"
+        self.assertRaisesRegexp(RuntimeError, msg, gl.switch, 5)
 
     def test_wrap_greenlet_dead(self):
         def func(value):
@@ -43,7 +44,8 @@ class WrapGreenletTests(tests.TestCase):
 
         gl = greenlet.greenlet(func)
         gl.switch(5)
-        self.assertRaises(RuntimeError, aiogreen.wrap_greenthread, gl)
+        msg = "wrap_greenthread: the greenthread already finished"
+        self.assertRaisesRegexp(RuntimeError, msg, aiogreen.wrap_greenthread, gl)
 
 
 if __name__ == '__main__':
