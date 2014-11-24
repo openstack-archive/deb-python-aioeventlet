@@ -112,6 +112,10 @@ History
 
 Maybe the good one, aiogreen project:
 
+* Novembre 23, two patches posted to Oslo Messaging:
+  `Add a new aiogreen executor <https://review.openstack.org/#/c/136653/>`_
+  and `Add an optional executor callback to dispatcher
+  <https://review.openstack.org/#/c/136652/>`_
 * November 19, 2014: First release of the aiogreen project
 
 OpenStack Kilo Summit, November 3-7, 2014, at Paris:
