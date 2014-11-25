@@ -54,13 +54,6 @@ _HUB_WRITE = eventlet.hubs.hub.WRITE
 _EVENTLET15 = hasattr(eventlet.hubs.hub.noop, 'mark_as_closed')
 
 
-class SocketTransport(asyncio.selector_events._SelectorSocketTransport):
-    def __repr__(self):
-        # override repr because _SelectorSocketTransport depends on
-        # loop._selector
-        return '<%s fd=%s>' % (self.__class__.__name__, self._sock_fd)
-
-
 class _TpoolExecutor(object):
     def __init__(self, loop):
         import eventlet.tpool
