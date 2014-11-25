@@ -356,7 +356,7 @@ class WrapGreenletTests(tests.TestCase):
             else:
                 event.send(fut)
 
-        gt = eventlet.spawn_n(func)
+        eventlet.spawn_n(func)
         msg = "wrap_greenthread: the greenthread is running"
         self.assertRaisesRegexp(RuntimeError, msg, event.wait)
 

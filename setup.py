@@ -17,16 +17,15 @@
 #  - increment version in setup.py and doc/conf.py
 #  - hg ci && hg push
 
-import os
 import sys
 try:
-    from setuptools import setup, Extension
+    from setuptools import setup
     SETUPTOOLS = True
 except ImportError:
     SETUPTOOLS = False
     # Use distutils.core as a fallback.
     # We won't be able to build the Wheel file on Windows.
-    from distutils.core import setup, Extension
+    from distutils.core import setup
 
 requirements = ['eventlet']
 if sys.version_info >= (3, 4):
