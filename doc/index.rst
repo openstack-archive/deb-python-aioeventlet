@@ -38,6 +38,8 @@ Table Of Contents
 Event loops
 ===========
 
+Projects used by aiogreen:
+
 * `asyncio documentation <http://docs.python.org/dev/library/asyncio.html>`_
 * `trollius documentation <http://trollius.readthedocs.org/>`_
 * `tulip project <http://code.google.com/p/tulip/>`_
@@ -45,5 +47,13 @@ Event loops
 * `eventlet project <http://eventlet.net/>`_
 * `greenlet documentation <http://greenlet.readthedocs.org/>`_
 
-See also the `greenio project <https://github.com/1st1/greenio/>`_:
-"Greenlets support for asyncio (PEP 3156)".
+See also:
+
+* `aiogevent <https://pypi.python.org/pypi/aiogevent>`_: asyncio API
+  implemented on top of gevent
+* `geventreactor <https://pypi.python.org/pypi/geventreactor>`_: gevent-powered
+  Twisted reactor
+* `greenio <https://github.com/1st1/greenio/>`_: Greenlets support
+  for asyncio (PEP 3156)
+* `tulipcore <https://github.com/decentfox/tulipcore>`_: run gevent code on
+  top of asyncio
