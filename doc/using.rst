@@ -126,10 +126,10 @@ aiogreen specific functions:
 .. warning::
    aiogreen API is not considered as stable yet.
 
-link_future
------------
+yield_future
+------------
 
-.. function:: link_future(future, loop=None)
+.. function:: yield_future(future, loop=None)
 
    Wait for a future, a task, or a coroutine object from a greenthread.
 
@@ -166,7 +166,7 @@ link_future
 
             task = asyncio.async(coro_slow_sum(1, 2))
 
-            value = aiogreen.link_future(task)
+            value = aiogreen.yield_future(task)
             print("1 + 2 = %s" % value)
 
             loop.stop()

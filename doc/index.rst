@@ -11,7 +11,7 @@ aiogreen implements the asyncio API (`PEP 3156
 possible to write asyncio code in a project currently written for eventlet.
 
 aiogreen allows to use greenthreads in asyncio coroutines, and to use asyncio
-coroutines, tasks and futures in greenthreads: see :func:`link_future` and
+coroutines, tasks and futures in greenthreads: see :func:`yield_future` and
 :func:`wrap_greenthread` functions.
 
 The main visible difference between aiogreen and trollius is the behaviour of
