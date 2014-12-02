@@ -1,4 +1,4 @@
-import aiogreen
+import aioeventlet
 try:
     import asyncio
 except ImportError:
@@ -15,7 +15,7 @@ except ImportError:
 
 class TestCase(unittest.TestCase):
     def setUp(self):
-        policy = aiogreen.EventLoopPolicy()
+        policy = aioeventlet.EventLoopPolicy()
         asyncio.set_event_loop_policy(policy)
         self.addCleanup(asyncio.set_event_loop_policy, None)
 

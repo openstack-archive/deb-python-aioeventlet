@@ -6,7 +6,7 @@ import sys
 socket = eventlet.patcher.original('socket')
 threading = eventlet.patcher.original('threading')
 
-logger = logging.getLogger('aiogreen')
+logger = logging.getLogger('aioeventlet')
 
 try:
     import asyncio
@@ -315,12 +315,12 @@ def yield_future(future, loop=None):
     Return the result or raise the exception of the future.
 
     The function must not be called from the greenthread
-    of the aiogreen event loop.
+    of the aioeventlet event loop.
     """
     future = asyncio.async(future, loop=loop)
     if future._loop._greenthread == eventlet.getcurrent():
         raise RuntimeError("yield_future() must not be called from "
-                           "the greenthread of the aiogreen event loop")
+                           "the greenthread of the aioeventlet event loop")
 
     event = eventlet.event.Event()
     def done(fut):

@@ -1,4 +1,4 @@
-import aiogreen
+import aioeventlet
 import eventlet
 import sys
 import tests
@@ -24,16 +24,16 @@ try:
             result = []
 
             gt = eventlet.spawn(eventlet_slow_append, result, 1, 0.020)
-            value = yield from aiogreen.wrap_greenthread(gt)
+            value = yield from aioeventlet.wrap_greenthread(gt)
             result.append(value)
 
             gt = eventlet.spawn(eventlet_slow_append, result, 2, 0.010)
-            value = yield from aiogreen.wrap_greenthread(gt)
+            value = yield from aioeventlet.wrap_greenthread(gt)
             result.append(value)
 
             gt = eventlet.spawn(eventlet_slow_error)
             try:
-                yield from aiogreen.wrap_greenthread(gt)
+                yield from aioeventlet.wrap_greenthread(gt)
             except ValueError as exc:
                 result.append(str(exc))
 
@@ -60,16 +60,16 @@ except ImportError:
         result = []
 
         gt = eventlet.spawn(eventlet_slow_append, result, 1, 0.020)
-        value = yield From(aiogreen.wrap_greenthread(gt))
+        value = yield From(aioeventlet.wrap_greenthread(gt))
         result.append(value)
 
         gt = eventlet.spawn(eventlet_slow_append, result, 2, 0.010)
-        value = yield From(aiogreen.wrap_greenthread(gt))
+        value = yield From(aioeventlet.wrap_greenthread(gt))
         result.append(value)
 
         gt = eventlet.spawn(eventlet_slow_error)
         try:
-            yield From(aiogreen.wrap_greenthread(gt))
+            yield From(aioeventlet.wrap_greenthread(gt))
         except ValueError as exc:
             result.append(str(exc))
 
@@ -90,14 +90,14 @@ except ImportError:
 
 def greenthread_yield_future(result, loop):
     try:
-        value = aiogreen.yield_future(coro_slow_append(result, 1, 0.020))
+        value = aioeventlet.yield_future(coro_slow_append(result, 1, 0.020))
         result.append(value)
 
-        value = aiogreen.yield_future(coro_slow_append(result, 2, 0.010))
+        value = aioeventlet.yield_future(coro_slow_append(result, 2, 0.010))
         result.append(value)
 
         try:
-            value = aiogreen.yield_future(coro_slow_error())
+            value = aioeventlet.yield_future(coro_slow_error())
         except ValueError as exc:
             result.append(str(exc))
 
@@ -174,7 +174,7 @@ class LinkFutureTests(tests.TestCase):
         result = []
 
         def func(fut):
-            value = aiogreen.yield_future(coro_slow_append(result, 3))
+            value = aioeventlet.yield_future(coro_slow_append(result, 3))
             result.append(value)
             self.loop.stop()
 
@@ -188,7 +188,7 @@ class LinkFutureTests(tests.TestCase):
 
         def func(event, fut):
             event.send('link')
-            value = aiogreen.yield_future(fut)
+            value = aioeventlet.yield_future(fut)
             result.append(value)
             self.loop.stop()
 
@@ -206,7 +206,7 @@ class LinkFutureTests(tests.TestCase):
 
         def func(fut):
             try:
-                value = aiogreen.yield_future(fut)
+                value = aioeventlet.yield_future(fut)
             except Exception as exc:
                 result.append('error')
             else:
@@ -221,7 +221,7 @@ class LinkFutureTests(tests.TestCase):
 
     def test_yield_future_invalid_type(self):
         def func(obj):
-            return aiogreen.yield_future(obj)
+            return aioeventlet.yield_future(obj)
 
         @asyncio.coroutine
         def coro_func():
@@ -243,7 +243,7 @@ class LinkFutureTests(tests.TestCase):
 
         def func(fut):
             try:
-                value = aiogreen.yield_future(fut, loop=loop2)
+                value = aioeventlet.yield_future(fut, loop=loop2)
             except Exception as exc:
                 result.append(str(exc))
             else:
@@ -265,7 +265,7 @@ class WrapGreenthreadTests(tests.TestCase):
             return 'ok'
 
         gt = eventlet.spawn(func)
-        fut = aiogreen.wrap_greenthread(gt)
+        fut = aioeventlet.wrap_greenthread(gt)
         result = self.loop.run_until_complete(fut)
         self.assertEqual(result, 'ok')
 
@@ -278,7 +278,7 @@ class WrapGreenthreadTests(tests.TestCase):
         # FIXME: the unit test must fail!?
         with tests.mock.patch('traceback.print_exception') as print_exception:
             gt = eventlet.spawn(func)
-            fut = aiogreen.wrap_greenthread(gt)
+            fut = aioeventlet.wrap_greenthread(gt)
             self.assertRaises(ValueError, self.loop.run_until_complete, fut)
 
         # the exception must not be logger by traceback: the caller must
@@ -287,7 +287,7 @@ class WrapGreenthreadTests(tests.TestCase):
 
     def test_wrap_greenthread_running(self):
         def func():
-            return aiogreen.wrap_greenthread(gt)
+            return aioeventlet.wrap_greenthread(gt)
 
         self.loop.set_debug(False)
         gt = eventlet.spawn(func)
@@ -304,7 +304,7 @@ class WrapGreenthreadTests(tests.TestCase):
 
         msg = "wrap_greenthread: the greenthread already finished"
         self.assertRaisesRegexp(RuntimeError, msg,
-                                aiogreen.wrap_greenthread, gt)
+                                aioeventlet.wrap_greenthread, gt)
 
     def test_coro_wrap_greenthread(self):
         result = self.loop.run_until_complete(coro_wrap_greenthread())
@@ -313,14 +313,14 @@ class WrapGreenthreadTests(tests.TestCase):
     def test_wrap_invalid_type(self):
         def func():
             pass
-        self.assertRaises(TypeError, aiogreen.wrap_greenthread, func)
+        self.assertRaises(TypeError, aioeventlet.wrap_greenthread, func)
 
         @asyncio.coroutine
         def coro_func():
             pass
         coro_obj = coro_func()
         self.addCleanup(coro_obj.close)
-        self.assertRaises(TypeError, aiogreen.wrap_greenthread, coro_obj)
+        self.assertRaises(TypeError, aioeventlet.wrap_greenthread, coro_obj)
 
 
 class WrapGreenletTests(tests.TestCase):
@@ -330,7 +330,7 @@ class WrapGreenletTests(tests.TestCase):
             return "ok"
 
         gt = eventlet.spawn_n(func)
-        fut = aiogreen.wrap_greenthread(gt)
+        fut = aioeventlet.wrap_greenthread(gt)
         result = self.loop.run_until_complete(fut)
         self.assertEqual(result, "ok")
 
@@ -341,7 +341,7 @@ class WrapGreenletTests(tests.TestCase):
             raise ValueError(7)
 
         gt = eventlet.spawn_n(func)
-        fut = aiogreen.wrap_greenthread(gt)
+        fut = aioeventlet.wrap_greenthread(gt)
         self.assertRaises(ValueError, self.loop.run_until_complete, fut)
 
     def test_wrap_greenlet_running(self):
@@ -350,7 +350,7 @@ class WrapGreenletTests(tests.TestCase):
         def func():
             try:
                 gt = eventlet.getcurrent()
-                fut = aiogreen.wrap_greenthread(gt)
+                fut = aioeventlet.wrap_greenthread(gt)
             except Exception as exc:
                 event.send_exception(exc)
             else:
@@ -368,7 +368,7 @@ class WrapGreenletTests(tests.TestCase):
         gt = eventlet.spawn_n(func)
         event.wait()
         msg = "wrap_greenthread: the greenthread already finished"
-        self.assertRaisesRegexp(RuntimeError, msg, aiogreen.wrap_greenthread, gt)
+        self.assertRaisesRegexp(RuntimeError, msg, aioeventlet.wrap_greenthread, gt)
 
 
 if __name__ == '__main__':
