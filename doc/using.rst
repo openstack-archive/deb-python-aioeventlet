@@ -138,6 +138,10 @@ yield_future
    The function must not be called from the greenthread of the aioeventlet event
    loop.
 
+   .. versionchanged:: 0.4
+
+      Rename the function from ``wrap_future()`` to :func:`yield_future`.
+
    .. versionchanged:: 0.3
 
       Coroutine objects are also accepted. Added the *loop* parameter.
