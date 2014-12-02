@@ -37,7 +37,7 @@ Hello World::
 
 
 Use aioeventlet with asyncio
--------------------------
+----------------------------
 
 aioeventlet can be used with asyncio, coroutines written with ``yield from ...``.
 To use aioeventlet with asyncio, set the event loop policy before using an event
@@ -272,7 +272,7 @@ Procedure for Python 2.7:
 * pip also installs dependencies: ``eventlet`` and ``trollius``
 
 Manual installation of aioeventlet
--------------------------------
+----------------------------------
 
 Requirements:
 
