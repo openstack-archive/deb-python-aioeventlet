@@ -1,28 +1,28 @@
-aiogreen
-========
+aioeventlet
+===========
 
 .. image:: poplar_hawk-moth.jpg
    :alt: Poplar Hawk-moth (Laothoe populi), photo taken in France
    :align: right
    :target: https://www.flickr.com/photos/haypo/7181768969/in/set-72157629731066236
 
-aiogreen implements the asyncio API (`PEP 3156
+aioeventlet implements the asyncio API (`PEP 3156
 <http://www.python.org/dev/peps/pep-3156/>`_) on top of eventlet. It makes
 possible to write asyncio code in a project currently written for eventlet.
 
-aiogreen allows to use greenthreads in asyncio coroutines, and to use asyncio
+aioeventlet allows to use greenthreads in asyncio coroutines, and to use asyncio
 coroutines, tasks and futures in greenthreads: see :func:`yield_future` and
 :func:`wrap_greenthread` functions.
 
-The main visible difference between aiogreen and trollius is the behaviour of
+The main visible difference between aioeventlet and trollius is the behaviour of
 ``run_forever()``: ``run_forever()`` blocks with trollius, whereas it runs in a
-greenthread with aiogreen. It means that aiogreen event loop can run in an
+greenthread with aioeventlet. It means that aioeventlet event loop can run in an
 greenthread while the Python main thread runs other greenthreads in parallel.
 
-* `aiogreen documentation <http://aiogreen.readthedocs.org/>`_
-* `aiogreen project in the Python Cheeseshop (PyPI)
-  <https://pypi.python.org/pypi/aiogreen>`_
-* `aiogreen project at Bitbucket <https://bitbucket.org/haypo/aiogreen>`_
+* `aioeventlet documentation <http://aioeventlet.readthedocs.org/>`_
+* `aioeventlet project in the Python Cheeseshop (PyPI)
+  <https://pypi.python.org/pypi/aioeventlet>`_
+* `aioeventlet project at Bitbucket <https://bitbucket.org/haypo/aioeventlet>`_
 * Copyright/license: Open source, Apache 2.0. Enjoy!
 
 Table Of Contents
@@ -38,7 +38,7 @@ Table Of Contents
 Event loops
 ===========
 
-Projects used by aiogreen:
+Projects used by aioeventlet:
 
 * `asyncio documentation <http://docs.python.org/dev/library/asyncio.html>`_
 * `trollius documentation <http://trollius.readthedocs.org/>`_

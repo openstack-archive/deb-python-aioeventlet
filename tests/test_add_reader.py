@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from aiogreen import socketpair
+from aioeventlet import socketpair
 import eventlet
 import tests
 socket = eventlet.patcher.original('socket')

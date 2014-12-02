@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# aiogreen documentation build configuration file, created by
+# aioeventlet documentation build configuration file, created by
 # sphinx-quickstart on Fri Nov 21 04:29:49 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -43,7 +43,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'aiogreen'
+project = u'aioeventlet'
 copyright = u'2014, Victor Stinner'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -176,7 +176,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'aiogreendoc'
+htmlhelp_basename = 'aioeventletdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -196,7 +196,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'aiogreen.tex', u'aiogreen Documentation',
+  ('index', 'aioeventlet.tex', u'aioeventlet Documentation',
    u'Victor Stinner', 'manual'),
 ]
 
@@ -226,7 +226,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'aiogreen', u'aiogreen Documentation',
+    ('index', 'aioeventlet', u'aioeventlet Documentation',
      [u'Victor Stinner'], 1)
 ]
 
@@ -240,8 +240,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'aiogreen', u'aiogreen Documentation',
-   u'Victor Stinner', 'aiogreen', 'One line description of project.',
+  ('index', 'aioeventlet', u'aioeventlet Documentation',
+   u'Victor Stinner', 'aioeventlet', 'One line description of project.',
    'Miscellaneous'),
 ]
 

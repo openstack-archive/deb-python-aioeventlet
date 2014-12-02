@@ -1,32 +1,32 @@
 Usage
 =====
 
-Use aiogreen with trollius
---------------------------
+Use aioeventlet with trollius
+-----------------------------
 
-aiogreen can be used with trollius, coroutines written with ``yield
-From(...)``. Using aiogreen with trollius is a good start to port project
+aioeventlet can be used with trollius, coroutines written with ``yield
+From(...)``. Using aioeventlet with trollius is a good start to port project
 written for eventlet to trollius.
 
-To use aiogreen with trollius, set the event loop policy before using an event
+To use aioeventlet with trollius, set the event loop policy before using an event
 loop, example::
 
-    import aiogreen
+    import aioeventlet
     import trollius
 
-    trollius.set_event_loop_policy(aiogreen.EventLoopPolicy())
+    trollius.set_event_loop_policy(aioeventlet.EventLoopPolicy())
     # ....
 
 Hello World::
 
-    import aiogreen
+    import aioeventlet
     import trollius as asyncio
 
     def hello_world():
         print("Hello World")
         loop.stop()
 
-    asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
+    asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
     loop = asyncio.get_event_loop()
     loop.call_soon(hello_world)
     loop.run_forever()
@@ -36,39 +36,39 @@ Hello World::
    `Trollius documentation <http://trollius.readthedocs.org/>`_.
 
 
-Use aiogreen with asyncio
+Use aioeventlet with asyncio
 -------------------------
 
-aiogreen can be used with asyncio, coroutines written with ``yield from ...``.
-To use aiogreen with asyncio, set the event loop policy before using an event
+aioeventlet can be used with asyncio, coroutines written with ``yield from ...``.
+To use aioeventlet with asyncio, set the event loop policy before using an event
 loop. Example::
 
-    import aiogreen
+    import aioeventlet
     import asyncio
 
-    asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
+    asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
     # ....
 
 Setting the event loop policy should be enough to examples of the asyncio
-documentation with the aiogreen event loop.
+documentation with the aioeventlet event loop.
 
 .. warning::
-   Since aiogreen relies on eventlet, eventlet port to Python 3 is not complete
-   and asyncio requires Python 3.3 or newer: using aiogreen with asyncio is not
-   recommended yet. *Using aiogreen with trollius should be preferred right
+   Since aioeventlet relies on eventlet, eventlet port to Python 3 is not complete
+   and asyncio requires Python 3.3 or newer: using aioeventlet with asyncio is not
+   recommended yet. *Using aioeventlet with trollius should be preferred right
    now*.  See the :ref:`status of the eventlet port to Python 3
    <eventlet-py3>`.
 
 Hello World::
 
-    import aiogreen
+    import aioeventlet
     import asyncio
 
     def hello_world():
         print("Hello World")
         loop.stop()
 
-    asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
+    asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
     loop = asyncio.get_event_loop()
     loop.call_soon(hello_world)
     loop.run_forever()
@@ -92,7 +92,7 @@ and threading.Queue to pass data between threads.
 Use ``threading = eventlet.patcher.original('threading')`` to get the original
 threading instead of ``import threading``.
 
-It is not possible to run two aiogreen event loops in the same thread.
+It is not possible to run two aioeventlet event loops in the same thread.
 
 
 Debug mode
@@ -121,10 +121,10 @@ event loop, but it enables less debug checks.
 API
 ===
 
-aiogreen specific functions:
+aioeventlet specific functions:
 
 .. warning::
-   aiogreen API is not considered as stable yet.
+   aioeventlet API is not considered as stable yet.
 
 yield_future
 ------------
@@ -135,19 +135,19 @@ yield_future
 
    Return the result or raise the exception of the future.
 
-   The function must not be called from the greenthread of the aiogreen event
+   The function must not be called from the greenthread of the aioeventlet event
    loop.
 
    .. versionchanged:: 0.3
 
       Coroutine objects are also accepted. Added the *loop* parameter.
       An exception is raised if it is called from the greenthread of the
-      aiogreen event loop.
+      aioeventlet event loop.
 
    Example of greenthread waiting for a trollius task. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
 
-        import aiogreen
+        import aioeventlet
         import eventlet
         import trollius as asyncio
         from trollius import From, Return
@@ -166,12 +166,12 @@ yield_future
 
             task = asyncio.async(coro_slow_sum(1, 2))
 
-            value = aiogreen.yield_future(task)
+            value = aioeventlet.yield_future(task)
             print("1 + 2 = %s" % value)
 
             loop.stop()
 
-        asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
+        asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
         eventlet.spawn(green_sum)
         loop = asyncio.get_event_loop()
         loop.run_forever()
@@ -208,7 +208,7 @@ wrap_greenthread
    Example of trollius coroutine waiting for a greenthread. The ``progress()``
    callback is called regulary to see that the event loop in not blocked::
 
-        import aiogreen
+        import aioeventlet
         import eventlet
         import trollius as asyncio
         from trollius import From, Return
@@ -226,12 +226,12 @@ wrap_greenthread
             loop.call_soon(progress)
 
             gt = eventlet.spawn(slow_sum, 1, 2)
-            fut = aiogreen.wrap_greenthread(gt, loop=loop)
+            fut = aioeventlet.wrap_greenthread(gt, loop=loop)
 
             result = yield From(fut)
             print("1 + 2 = %s" % result)
 
-        asyncio.set_event_loop_policy(aiogreen.EventLoopPolicy())
+        asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
         loop = asyncio.get_event_loop()
         loop.run_until_complete(coro_sum())
         loop.close()
@@ -247,15 +247,15 @@ wrap_greenthread
 Installation
 ============
 
-Install aiogreen with pip
--------------------------
+Install aioeventlet with pip
+----------------------------
 
 Type::
 
-    pip install aiogreen
+    pip install aioeventlet
 
-Install aiogreen on Windows with pip
-------------------------------------
+Install aioeventlet on Windows with pip
+---------------------------------------
 
 Procedure for Python 2.7:
 
@@ -265,13 +265,13 @@ Procedure for Python 2.7:
 
   \Python27\python.exe get-pip.py
 
-* Install aiogreen with pip::
+* Install aioeventlet with pip::
 
-  \Python27\python.exe -m pip install aiogreen
+  \Python27\python.exe -m pip install aioeventlet
 
 * pip also installs dependencies: ``eventlet`` and ``trollius``
 
-Manual installation of aiogreen
+Manual installation of aioeventlet
 -------------------------------
 
 Requirements:

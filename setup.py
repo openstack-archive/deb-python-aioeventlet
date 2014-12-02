@@ -42,7 +42,7 @@ with open("README") as fp:
     long_description = fp.read()
 
 install_options = {
-    "name": "aiogreen",
+    "name": "aioeventlet",
     "version": "0.4",
     "license": "Apache License 2.0",
     "author": 'Victor Stinner',
@@ -50,7 +50,7 @@ install_options = {
 
     "description": "asyncio event loop scheduling callbacks in eventlet.",
     "long_description": long_description,
-    "url": "http://aiogreen.readthedocs.org/",
+    "url": "http://aioeventlet.readthedocs.org/",
 
     "classifiers": [
         "Programming Language :: Python",
@@ -58,7 +58,7 @@ install_options = {
         "License :: OSI Approved :: Apache Software License",
     ],
 
-    "py_modules": ["aiogreen"],
+    "py_modules": ["aioeventlet"],
     #"test_suite": "runtests.runtests",
 }
 if SETUPTOOLS:

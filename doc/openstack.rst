@@ -14,14 +14,14 @@ Already done:
 * Write the trollius project: port asyncio to Python 2
 * Stabilize trollius API
 * Add trollius dependency to OpenStack
-* Write the aiogreen project to provide the asyncio API on top of eventlet
+* Write the aioeventlet project to provide the asyncio API on top of eventlet
 
 To do:
 
-* Stabilize aiogreen API
-* Add aiogreen dependency to OpenStack
-* Write an aiogreen executor for Oslo Messaging: rewrite greenio executor
-  to replace greenio with aiogreen
+* Stabilize aioeventlet API
+* Add aioeventlet dependency to OpenStack
+* Write an aioeventlet executor for Oslo Messaging: rewrite greenio executor
+  to replace greenio with aioeventlet
 
 Second part (to do): rewrite code as trollius coroutines
 --------------------------------------------------------
@@ -46,9 +46,9 @@ with a lot of legacy code, it has many drivers and the code base is large.
 To do:
 
 * Ceilometer: add trollius dependency and set the trollius event loop policy to
-  aiogreen
-* Ceilometer: change Oslo Messaging executor from "eventlet" to "aiogreen"
-* Redesign the service class of Oslo Incubator to support aiogreen and/or
+  aioeventlet
+* Ceilometer: change Oslo Messaging executor from "eventlet" to "aioeventlet"
+* Redesign the service class of Oslo Incubator to support aioeventlet and/or
   trollius.  Currently, the class is designed for eventlet. The service class
   is instanciated before forking, which requires hacks on eventlet to update
   file descriptors.
@@ -77,7 +77,7 @@ Questions:
 Last part (to do): drop eventlet
 --------------------------------
 
-Replace aiogreen event loop with trollius event loop, drop aiogreen and drop
+Replace aioeventlet event loop with trollius event loop, drop aioeventlet and drop
 eventlet at the end.
 
 This change will be done on applications one by one. This is no need to port
@@ -90,7 +90,7 @@ To do:
 * Write a "trollius" executor for Oslo Messaging
 * Ceilometer: Add a blocking call to ``loop.run_forever()`` in the ``main()``
   function
-* Ceilometer: Replace "aiogreen" executor with "trollius" executor
+* Ceilometer: Replace "aioeventlet" executor with "trollius" executor
 * Ceilometer: Use the standard trollius event loop policy
 * Ceilometer: drop the eventlet dependency
 
@@ -110,13 +110,13 @@ Optimization, can be done later:
 History
 -------
 
-Maybe the good one, aiogreen project:
+Maybe the good one, aioeventlet project:
 
 * Novembre 23, two patches posted to Oslo Messaging:
-  `Add a new aiogreen executor <https://review.openstack.org/#/c/136653/>`_
+  `Add a new aioeventlet executor <https://review.openstack.org/#/c/136653/>`_
   and `Add an optional executor callback to dispatcher
   <https://review.openstack.org/#/c/136652/>`_
-* November 19, 2014: First release of the aiogreen project
+* November 19, 2014: First release of the aioeventlet project
 
 OpenStack Kilo Summit, November 3-7, 2014, at Paris:
 
@@ -164,7 +164,7 @@ First try with a trollius executor for Oslo Messaging:
 * March 21, 2014: Patch `Replace ad-hoc coroutines with Trollius coroutines
   <https://review.openstack.org/#/c/77925/>`_ proposed to Heat. Heat coroutines
   are close to Trollius coroutines. Patch abandonned, need to be rewritten,
-  maybe with aiogreen.
+  maybe with aioeventlet.
 * February 20, 2014: The full specification of the blueprint was written:
   `Oslo/blueprints/asyncio
   <https://wiki.openstack.org/wiki/Oslo/blueprints/asyncio>`_

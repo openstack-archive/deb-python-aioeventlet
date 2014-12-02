@@ -5,7 +5,7 @@ test:
 doc:
 	make -C doc html
 clean:
-	rm -rf build dist aiogreen.egg-info .tox
+	rm -rf build dist aioeventlet.egg-info .tox
 	find -name "*.pyc" -delete
 	find -name "__pycache__" -exec rm -rf {} \;
 	make -C doc clean
