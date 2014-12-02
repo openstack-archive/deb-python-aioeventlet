@@ -43,7 +43,7 @@ with open("README") as fp:
 
 install_options = {
     "name": "aiogreen",
-    "version": "0.3",
+    "version": "0.4",
     "license": "Apache License 2.0",
     "author": 'Victor Stinner',
     "author_email": 'victor.stinner@gmail.com',

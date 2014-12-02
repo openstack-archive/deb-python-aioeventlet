@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.4
+-----------
+
+* Rename the ``link_future()`` function to :func:`yield_future`
+
 2014-10-23: version 0.3
 -----------------------
 
