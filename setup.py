@@ -43,7 +43,7 @@ with open("README") as fp:
 
 install_options = {
     "name": "aioeventlet",
-    "version": "0.4",
+    "version": "0.5",
     "license": "Apache License 2.0",
     "author": 'Victor Stinner',
     "author_email": 'victor.stinner@gmail.com',
