@@ -1,13 +1,13 @@
 Changelog
 =========
 
-Version 0.4
------------
+2014-12-03: Version 0.4
+-----------------------
 
 * Rename the project from ``aiogreen`` to ``aioeventlet``
 * Rename the ``link_future()`` function to :func:`yield_future`
 
-2014-10-23: version 0.3
+2014-11-23: version 0.3
 -----------------------
 
 * :func:`wrap_greenthread` now raises an exception if the greenthread is
@@ -22,7 +22,7 @@ Version 0.4
   mode: disable eventlet "debug_blocking", it is implemented with the SIGALRM
   signal, but signal handlers can only be set in the main thread.
 
-2014-10-21: version 0.2
+2014-11-21: version 0.2
 -----------------------
 
 aiogreen event loop has been rewritten to reuse more asyncio/trollius code. It
