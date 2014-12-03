@@ -112,7 +112,10 @@ History
 
 Maybe the good one, aioeventlet project:
 
-* Novembre 23, two patches posted to Oslo Messaging:
+* December 3, 2014: two patches posted to requirements:
+  `Add aioeventlet dependency <https://review.openstack.org/#/c/138750/>`_
+  and `Drop greenio dependency <https://review.openstack.org/#/c/138748/>`_.
+* Novembre 23, 2014: two patches posted to Oslo Messaging:
   `Add a new aioeventlet executor <https://review.openstack.org/#/c/136653/>`_
   and `Add an optional executor callback to dispatcher
   <https://review.openstack.org/#/c/136652/>`_
