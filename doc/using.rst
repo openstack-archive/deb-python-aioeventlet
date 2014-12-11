@@ -168,9 +168,7 @@ yield_future
         def green_sum():
             loop.call_soon(progress)
 
-            task = asyncio.async(coro_slow_sum(1, 2))
-
-            value = aioeventlet.yield_future(task)
+            value = aioeventlet.yield_future(coro_slow_sum(1, 2))
             print("1 + 2 = %s" % value)
 
             loop.stop()
