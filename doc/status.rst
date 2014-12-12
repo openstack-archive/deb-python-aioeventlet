@@ -1,6 +1,7 @@
 To do
 =====
 
+* support monkey-patching enabled after loading the aioeventlet module
 * register signals in eventlet hub, only needed for pyevent hub?
 * port greenio examples to aioeventlet
 * write unit tests for, and maybe also examples for:
