@@ -26,7 +26,7 @@ eventlet issues
   https://github.com/eventlet/eventlet/pull/168
 * eventlet.tpool.setup() seems to be broken on Windows in eventlet 0.15.
   Pull request:
-  https://github.com/eventlet/eventlet/pull/167
+  https://github.com/eventlet/eventlet/pull/167 -- merged!
 * hub.debug_blocking is implemented with signal.alarm() which is is not
   available on Windows.
 
@@ -42,11 +42,11 @@ supported if monkey-patching is not used.
 Python 3 pull requests:
 
 * Pull request #160: `Python 3 compat; Improve WSGI, WS, threading and tests
-  <https://github.com/eventlet/eventlet/pull/160>`_ (sent the Nov 5, 2014): not
-  merged yet
+  <https://github.com/eventlet/eventlet/pull/160>`_ (sent the Nov 5, 2014):
+  merged!
 * Pull request #99, `Fix several issues with python3 thread patching
   <https://github.com/eventlet/eventlet/pull/99>`_ (sent the July 3, 2014): not
-  merged yet, see the `commit
+  merged, see the `commit
   <https://github.com/therve/eventlet/commit/9c3118162cf1ca1e50be330ba2a289f054c48d3c>`_
 
 Python 3 issues:
