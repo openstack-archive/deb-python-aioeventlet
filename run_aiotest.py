@@ -1,8 +1,13 @@
-#import eventlet; eventlet.monkey_patch()
+import eventlet
+import sys
+
+if '-m' in sys.argv:
+    print("Enable eventlet monkey patching")
+    eventlet.monkey_patch()
+    sys.argv.remove('-m')
 
 import aioeventlet
 import aiotest.run
-import eventlet
 
 config = aiotest.TestConfig()
 config.asyncio = aioeventlet.asyncio

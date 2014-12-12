@@ -4,6 +4,8 @@ Changelog
 2014-12-03: Version 0.4
 -----------------------
 
+* Add run_aiotest.py
+* tox now also run the aiotest test suite
 * Rename the project from ``aiogreen`` to ``aioeventlet``
 * Rename the ``link_future()`` function to :func:`yield_future`
 
