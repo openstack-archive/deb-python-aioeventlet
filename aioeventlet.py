@@ -315,7 +315,7 @@ def yield_future(future, loop=None):
     Return the result or raise the exception of the future.
 
     The function must not be called from the greenthread
-    of the aioeventlet event loop.
+    running the aioeventlet event loop.
     """
     future = asyncio.async(future, loop=loop)
     if future._loop._greenthread == eventlet.getcurrent():

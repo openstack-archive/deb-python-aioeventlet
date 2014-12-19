@@ -135,8 +135,8 @@ yield_future
 
    Return the result or raise the exception of the future.
 
-   The function must not be called from the greenthread of the aioeventlet event
-   loop.
+   The function must not be called from the greenthread running the aioeventlet
+   event loop.
 
    .. versionchanged:: 0.4
 
