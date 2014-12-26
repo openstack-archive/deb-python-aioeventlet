@@ -28,6 +28,12 @@ if eventlet.patcher.is_monkey_patched('socket'):
     # Examples: socket.socket(), socket.socketpair(),
     # threading.current_thread().
     asyncio.base_events.socket = socket
+    asyncio.base_events.threading = threading
+    if hasattr(threading, 'get_ident'):
+        asyncio.base_events._get_thread_ident = threading.get_ident
+    else:
+        # Python 2
+        asyncio.base_events._get_thread_ident = threading._get_ident
     asyncio.events.threading = threading
     if sys.platform == 'win32':
         asyncio.windows_events.socket = socket
