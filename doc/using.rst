@@ -317,7 +317,8 @@ To run tests against other Python versions:
   trollius
 * ``py32``: Python 3.2
 * ``py33``: Python 3.3
-* ``py33_old``: Python 3.3 with the oldest supported versions of eventlet and
+* ``py3_patch``: Python 3 with eventlet monkey patching
+* ``py3_old``: Python 3 with the oldest supported versions of eventlet and
   tulip
 * ``py34``: Python 3.4
 

@@ -10,6 +10,7 @@ Changelog
 * tox now also run the aiotest test suite
 * Rename the project from ``aiogreen`` to ``aioeventlet``
 * Rename the ``link_future()`` function to :func:`yield_future`
+* Running tests with eventlet monkey-patching now works with Python 3.
 
 2014-11-23: version 0.3
 -----------------------

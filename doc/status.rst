@@ -14,22 +14,6 @@ To do
   - subprocesses
 
 * experiment running an event loop in a thread different than the main thread
-* tox.ini: test Python 3.3 with monkey-patching, see eventlet bug:
-  https://github.com/eventlet/eventlet/pull/168
-
-
-eventlet issues
-===============
-
-* eventlet monkey patching on Python 3 is incomplete. The most blocking issue
-  is in the importlib: the thread module is patched to use greenthreads, but
-  importlib really need to work on real threads. Pull request:
-  https://github.com/eventlet/eventlet/pull/168
-* eventlet.tpool.setup() seems to be broken on Windows in eventlet 0.15.
-  Pull request:
-  https://github.com/eventlet/eventlet/pull/167 -- merged!
-* hub.debug_blocking is implemented with signal.alarm() which is is not
-  available on Windows.
 
 
 .. _eventlet-py3:
@@ -37,8 +21,11 @@ eventlet issues
 eventlet and Python 3
 =====================
 
-eventlet 0.15 is the first release supporting Python 3. Python 3 is only
-supported if monkey-patching is not used.
+eventlet 0.16 or newer is recommanded for Python 3 when monkey-patching is
+enabled.
+
+eventlet 0.15 is the first release supporting Python 3, its monkey-patching
+does not work with Python 3.
 
 Python 3 pull requests:
 
