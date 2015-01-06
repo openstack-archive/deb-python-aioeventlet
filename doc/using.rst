@@ -123,9 +123,6 @@ API
 
 aioeventlet specific functions:
 
-.. warning::
-   aioeventlet API is not considered as stable yet.
-
 yield_future
 ------------
 

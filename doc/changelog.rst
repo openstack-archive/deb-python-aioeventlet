@@ -1,6 +1,8 @@
 Changelog
 =========
 
+* aioeventlet API is now considered as stable
+
 2014-12-03: Version 0.4
 -----------------------
 
