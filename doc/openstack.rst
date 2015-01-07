@@ -107,8 +107,40 @@ Optimization, can be done later:
   parallel tasks (ex: send multiple requests to a database)
 
 
-History
--------
+openstack-dev mailing list
+--------------------------
+
+* `[oslo] Progress of the port to Python 3
+  <http://lists.openstack.org/pipermail/openstack-dev/2015-January/053846.html>`_
+  (Victor Stinner, Jan 6 2015)
+
+* `[oslo] Add a new aiogreen executor for Oslo Messaging
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-November/051337.html>`_
+  (Victor Stinner, Nov 23 2014)
+
+* `[oslo] Asyncio and oslo.messaging
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-July/039291.html>`_
+  (Mark McLoughlin, Jul 3 2014)
+
+  * `SQLAlchemy and asynchronous programming
+    <http://lists.openstack.org/pipermail/openstack-dev/2014-July/039480.html>`_
+    by Mike Bayer (author and maintainer of SQLAlchemy)
+
+* `[Solum][Oslo] Next Release of oslo.messaging?
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-March/030304.html>`_
+  (Victor Stinner, Mar 18 2014)
+
+* `[solum] async / threading for python 2 and 3
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-February/027685.html>`_
+  (Victor Stinner, Feb 20 2014)
+
+* `Asynchrounous programming: replace eventlet with asyncio
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-February/026237.html>`_
+  (Victor Stinner, Feb 4 2014)
+
+
+History of asyncio in OpenStack
+-------------------------------
 
 Maybe the good one, aioeventlet project:
 
@@ -151,7 +183,7 @@ New try with a greenio executor for Oslo Messaging:
   <https://review.openstack.org/#/c/104792/>`_ merged into openstack/oslo-specs.
 * July 7, 2014: Patch `Fix AMQPListener for polling with timeout
   <https://review.openstack.org/#/c/104964/>`_ merged into Oslo Messaging
-* July: greenio executor, `[openstack-dev] [oslo] Asyncio and oslo.messaging
+* July 2014: greenio executor, `[openstack-dev] [oslo] Asyncio and oslo.messaging
   <http://lists.openstack.org/pipermail/openstack-dev/2014-July/039291.html>`_
 
 First try with a trollius executor for Oslo Messaging:
@@ -189,3 +221,11 @@ First discussion around asyncio and OpenStack:
   <https://blueprints.launchpad.net/oslo.messaging/+spec/asyncio-executor>`_
   proposed by Flavio Percoco and accepted for OpenStack Icehouse by Mark
   McLoughlin
+
+
+History of asynchronous programming in OpenStack
+------------------------------------------------
+
+In the past, the Nova project used Tornado, then Twisted and it is now using
+eventlet which also became the defacto standard in OpenStack
+
