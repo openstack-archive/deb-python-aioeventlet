@@ -1,0 +1,89 @@
+Source: python-aioeventlet
+Section: python
+Priority: optional
+Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
+Uploaders: Thomas Goirand <zigo@debian.org>
+Build-Depends: debhelper (>= 9),
+               dh-python,
+               python-all (>= 2.6.6-3~),
+               python-setuptools,
+               python-sphinx,
+               python3-all,
+               python3-setuptools
+Build-Depends-Indep: python-asyncio (>= 0.4.1),
+                     python-trollius (>= 0.3),
+                     python3-asyncio (>= 0.4.1),
+                     python3-trollius (>= 0.3)
+Standards-Version: 3.9.6
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/python-aioeventlet.git
+Vcs-Git: git://anonscm.debian.org/openstack/python-aioeventlet.git
+Homepage: http://aioeventlet.readthedocs.org/
+
+Package: python-aioeventlet
+Architecture: all
+Pre-Depends: dpkg (>= 1.15.6~)
+Depends: python-asyncio (>= 0.4.1),
+         python-trollius (>= 0.3),
+         ${misc:Depends},
+         ${python:Depends}
+Suggests: python-aioeventlet-doc
+Description: asyncio event loop scheduling callbacks in eventlet - Python 2.x
+ aioeventlet implements the asyncio API (PEP 3156) on top of eventlet. It makes
+ possible to write asyncio code in a project currently written for eventlet.
+ .
+ aioeventlet allows to use greenthreads in asyncio coroutines, and to use
+ asyncio coroutines, tasks and futures in greenthreads: see link_future() and
+ wrap_greenthread() functions.
+ .
+ The main visible difference between aioeventlet and trollius is the behaviour
+ of run_forever(): run_forever() blocks with trollius, whereas it runs in a
+ greenthread with aioeventlet. It means that aioeventlet event loop can run in
+ an greenthread while the Python main thread runs other greenthreads in
+ parallel.
+ .
+ This package contains the Python 2.x module.
+
+Package: python3-aioeventlet
+Architecture: all
+Pre-Depends: dpkg (>= 1.15.6~)
+Depends: python3-asyncio (>= 0.4.1),
+         python3-trollius (>= 0.3),
+         ${misc:Depends},
+         ${python3:Depends}
+Suggests: python-aioeventlet-doc
+Description: asyncio event loop scheduling callbacks in eventlet - Python 3.x
+ aioeventlet implements the asyncio API (PEP 3156) on top of eventlet. It makes
+ possible to write asyncio code in a project currently written for eventlet.
+ .
+ aioeventlet allows to use greenthreads in asyncio coroutines, and to use
+ asyncio coroutines, tasks and futures in greenthreads: see link_future() and
+ wrap_greenthread() functions.
+ .
+ The main visible difference between aioeventlet and trollius is the behaviour
+ of run_forever(): run_forever() blocks with trollius, whereas it runs in a
+ greenthread with aioeventlet. It means that aioeventlet event loop can run in
+ an greenthread while the Python main thread runs other greenthreads in
+ parallel.
+ .
+ This package contains the Python 3.x module.
+
+Package: python-aioeventlet-doc
+Section: doc
+Architecture: all
+Pre-Depends: dpkg (>= 1.15.6~)
+Depends: ${misc:Depends}, ${sphinxdoc:Depends}
+Description: asyncio event loop scheduling callbacks in eventlet - doc
+ aioeventlet implements the asyncio API (PEP 3156) on top of eventlet. It makes
+ possible to write asyncio code in a project currently written for eventlet.
+ .
+ aioeventlet allows to use greenthreads in asyncio coroutines, and to use
+ asyncio coroutines, tasks and futures in greenthreads: see link_future() and
+ wrap_greenthread() functions.
+ .
+ The main visible difference between aioeventlet and trollius is the behaviour
+ of run_forever(): run_forever() blocks with trollius, whereas it runs in a
+ greenthread with aioeventlet. It means that aioeventlet event loop can run in
+ an greenthread while the Python main thread runs other greenthreads in
+ parallel.
+ .
+ This package contains the documentation.

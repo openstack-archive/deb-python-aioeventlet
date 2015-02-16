@@ -1,0 +1,9 @@
+Document: python-aioeventlet-doc
+Title: aioeventlet Documentation
+Author: N/A
+Abstract: Sphinx documentation for aioeventlet
+Section: Programming/Python
+
+Format: HTML
+Index: /usr/share/doc/python-aioeventlet-doc/html/index.html
+Files: /usr/share/doc/python-aioeventlet-doc/html/*

@@ -1,0 +1,5 @@
+python-aioeventlet (0.4-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #778542)
+
+ -- Thomas Goirand <zigo@debian.org>  Mon, 16 Feb 2015 15:05:58 +0100
