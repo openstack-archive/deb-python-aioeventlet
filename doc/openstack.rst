@@ -144,6 +144,11 @@ History of asyncio in OpenStack
 
 Maybe the good one, aioeventlet project:
 
+* February 17, 2015: Joshua Harlow wrote a different spec,
+  `Sew over eventlet + patching with threads
+  <https://review.openstack.org/#/c/156711/>`_
+* February 5, 2015: new cross-project spec `Replace eventlet with asyncio
+  <https://review.openstack.org/#/c/153298/>`_
 * December 3, 2014: two patches posted to requirements:
   `Add aioeventlet dependency <https://review.openstack.org/#/c/138750/>`_
   and `Drop greenio dependency <https://review.openstack.org/#/c/138748/>`_.
