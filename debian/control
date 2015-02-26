@@ -22,8 +22,7 @@ Homepage: http://aioeventlet.readthedocs.org/
 Package: python-aioeventlet
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.6~)
-Depends: python-asyncio (>= 0.4.1),
-         python-trollius (>= 0.3),
+Depends: python-trollius (>= 0.3),
          ${misc:Depends},
          ${python:Depends}
 Suggests: python-aioeventlet-doc
@@ -46,9 +45,7 @@ Description: asyncio event loop scheduling callbacks in eventlet - Python 2.x
 Package: python3-aioeventlet
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.6~)
-Depends: python3-asyncio (>= 0.4.1),
-         python3-trollius (>= 0.3),
-         ${misc:Depends},
+Depends: ${misc:Depends},
          ${python3:Depends}
 Suggests: python-aioeventlet-doc
 Description: asyncio event loop scheduling callbacks in eventlet - Python 3.x
