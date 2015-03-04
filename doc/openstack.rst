@@ -142,6 +142,13 @@ openstack-dev mailing list
 History of asyncio in OpenStack
 -------------------------------
 
+Threads and asyncio specs:
+
+* `Cross-project meeting: 2015-03-02
+  <http://eavesdrop.openstack.org/meetings/crossproject/2015/crossproject.2015-03-03-21.02.log.html>`_
+* `Cross-project meeting: 2015-02-24T21:44:05
+  <http://eavesdrop.openstack.org/meetings/crossproject/2015/crossproject.2015-02-24-21.03.log.html>`_
+
 Maybe the good one, aioeventlet project:
 
 * February 17, 2015: Joshua Harlow wrote a different spec,
