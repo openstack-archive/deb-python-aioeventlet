@@ -151,6 +151,8 @@ Threads and asyncio specs:
 
 Maybe the good one, aioeventlet project:
 
+* March 13, 2015: Joshua Harlow wrote the spec `Replace eventlet +
+  monkey-patching with ?? <https://review.openstack.org/#/c/164035/>`_
 * February 17, 2015: Joshua Harlow wrote a different spec,
   `Sew over eventlet + patching with threads
   <https://review.openstack.org/#/c/156711/>`_
