@@ -1,6 +1,14 @@
 Changelog
 =========
 
+2016-02-22: Version 0.5.1
+-------------------------
+
+* Fix EventLoop.stop() for the new semantics of stop() introduced
+  in Python 3.4.4 and Python 3.5.1. The method now writes into the self-pipe
+  to wake-up the event loop. Otherwise, the stop() may not be taken in account
+  immediatly, and even block forever.
+
 2016-02-22: Version 0.5
 -----------------------
 

@@ -1,8 +1,49 @@
 Usage
 =====
 
+Use aioeventlet with asyncio
+----------------------------
+
+aioeventlet can be used with asyncio, coroutines written with ``yield from ...``.
+To use aioeventlet with asyncio, set the event loop policy before using an event
+loop. Example::
+
+    import aioeventlet
+    import asyncio
+
+    asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
+    # ....
+
+Setting the event loop policy should be enough to examples of the asyncio
+documentation with the aioeventlet event loop.
+
+Hello World::
+
+    import aioeventlet
+    import asyncio
+
+    def hello_world():
+        print("Hello World")
+        loop.stop()
+
+    asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
+    loop = asyncio.get_event_loop()
+    loop.call_soon(hello_world)
+    loop.run_forever()
+    loop.close()
+
+.. seealso::
+   The `asyncio documentation
+   <https://docs.python.org/dev/library/asyncio.html>`_.
+
+
 Use aioeventlet with trollius
 -----------------------------
+
+.. warning::
+   The `trollius project is now deprecated
+   <http://trollius.readthedocs.org/deprecated.html>`_. It's now recommended to
+   use aioeventlet with asyncio.
 
 aioeventlet can be used with trollius, coroutines written with ``yield
 From(...)``. Using aioeventlet with trollius is a good start to port project
@@ -34,49 +75,6 @@ Hello World::
 
 .. seealso::
    `Trollius documentation <http://trollius.readthedocs.org/>`_.
-
-
-Use aioeventlet with asyncio
-----------------------------
-
-aioeventlet can be used with asyncio, coroutines written with ``yield from ...``.
-To use aioeventlet with asyncio, set the event loop policy before using an event
-loop. Example::
-
-    import aioeventlet
-    import asyncio
-
-    asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
-    # ....
-
-Setting the event loop policy should be enough to examples of the asyncio
-documentation with the aioeventlet event loop.
-
-.. warning::
-   Since aioeventlet relies on eventlet, eventlet port to Python 3 is not complete
-   and asyncio requires Python 3.3 or newer: using aioeventlet with asyncio is not
-   recommended yet. *Using aioeventlet with trollius should be preferred right
-   now*.  See the :ref:`status of the eventlet port to Python 3
-   <eventlet-py3>`.
-
-Hello World::
-
-    import aioeventlet
-    import asyncio
-
-    def hello_world():
-        print("Hello World")
-        loop.stop()
-
-    asyncio.set_event_loop_policy(aioeventlet.EventLoopPolicy())
-    loop = asyncio.get_event_loop()
-    loop.call_soon(hello_world)
-    loop.run_forever()
-    loop.close()
-
-.. seealso::
-   The `asyncio documentation
-   <https://docs.python.org/dev/library/asyncio.html>`_.
 
 
 Threads
