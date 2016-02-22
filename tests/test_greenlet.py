@@ -26,8 +26,8 @@ class WrapGreenletTests(tests.TestCase):
     def test_wrap_greenlet_no_run_attr(self):
         gl = greenlet.greenlet()
         msg = "wrap_greenthread: the run attribute of the greenlet is not set"
-        self.assertRaisesRegexp(RuntimeError, msg,
-                                aioeventlet.wrap_greenthread, gl)
+        self.assertRaisesRegex(RuntimeError, msg,
+                               aioeventlet.wrap_greenthread, gl)
 
     def test_wrap_greenlet_running(self):
         def func(value):
@@ -36,7 +36,7 @@ class WrapGreenletTests(tests.TestCase):
 
         gl = greenlet.greenlet(func)
         msg = "wrap_greenthread: the greenthread is running"
-        self.assertRaisesRegexp(RuntimeError, msg, gl.switch, 5)
+        self.assertRaisesRegex(RuntimeError, msg, gl.switch, 5)
 
     def test_wrap_greenlet_dead(self):
         def func(value):
@@ -45,7 +45,7 @@ class WrapGreenletTests(tests.TestCase):
         gl = greenlet.greenlet(func)
         gl.switch(5)
         msg = "wrap_greenthread: the greenthread already finished"
-        self.assertRaisesRegexp(RuntimeError, msg, aioeventlet.wrap_greenthread, gl)
+        self.assertRaisesRegex(RuntimeError, msg, aioeventlet.wrap_greenthread, gl)
 
 
 if __name__ == '__main__':

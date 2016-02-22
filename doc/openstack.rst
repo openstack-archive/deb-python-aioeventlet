@@ -107,12 +107,61 @@ Optimization, can be done later:
   parallel tasks (ex: send multiple requests to a database)
 
 
-History
--------
+openstack-dev mailing list
+--------------------------
+
+* `[oslo] Progress of the port to Python 3
+  <http://lists.openstack.org/pipermail/openstack-dev/2015-January/053846.html>`_
+  (Victor Stinner, Jan 6 2015)
+
+* `[oslo] Add a new aiogreen executor for Oslo Messaging
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-November/051337.html>`_
+  (Victor Stinner, Nov 23 2014)
+
+* `[oslo] Asyncio and oslo.messaging
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-July/039291.html>`_
+  (Mark McLoughlin, Jul 3 2014)
+
+  * `SQLAlchemy and asynchronous programming
+    <http://lists.openstack.org/pipermail/openstack-dev/2014-July/039480.html>`_
+    by Mike Bayer (author and maintainer of SQLAlchemy)
+
+* `[Solum][Oslo] Next Release of oslo.messaging?
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-March/030304.html>`_
+  (Victor Stinner, Mar 18 2014)
+
+* `[solum] async / threading for python 2 and 3
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-February/027685.html>`_
+  (Victor Stinner, Feb 20 2014)
+
+* `Asynchrounous programming: replace eventlet with asyncio
+  <http://lists.openstack.org/pipermail/openstack-dev/2014-February/026237.html>`_
+  (Victor Stinner, Feb 4 2014)
+
+
+History of asyncio in OpenStack
+-------------------------------
+
+Threads and asyncio specs:
+
+* `Cross-project meeting: 2015-03-02
+  <http://eavesdrop.openstack.org/meetings/crossproject/2015/crossproject.2015-03-03-21.02.log.html>`_
+* `Cross-project meeting: 2015-02-24T21:44:05
+  <http://eavesdrop.openstack.org/meetings/crossproject/2015/crossproject.2015-02-24-21.03.log.html>`_
 
 Maybe the good one, aioeventlet project:
 
-* Novembre 23, two patches posted to Oslo Messaging:
+* March 13, 2015: Joshua Harlow wrote the spec `Replace eventlet +
+  monkey-patching with ?? <https://review.openstack.org/#/c/164035/>`_
+* February 17, 2015: Joshua Harlow wrote a different spec,
+  `Sew over eventlet + patching with threads
+  <https://review.openstack.org/#/c/156711/>`_
+* February 5, 2015: new cross-project spec `Replace eventlet with asyncio
+  <https://review.openstack.org/#/c/153298/>`_
+* December 3, 2014: two patches posted to requirements:
+  `Add aioeventlet dependency <https://review.openstack.org/#/c/138750/>`_
+  and `Drop greenio dependency <https://review.openstack.org/#/c/138748/>`_.
+* Novembre 23, 2014: two patches posted to Oslo Messaging:
   `Add a new aioeventlet executor <https://review.openstack.org/#/c/136653/>`_
   and `Add an optional executor callback to dispatcher
   <https://review.openstack.org/#/c/136652/>`_
@@ -148,7 +197,7 @@ New try with a greenio executor for Oslo Messaging:
   <https://review.openstack.org/#/c/104792/>`_ merged into openstack/oslo-specs.
 * July 7, 2014: Patch `Fix AMQPListener for polling with timeout
   <https://review.openstack.org/#/c/104964/>`_ merged into Oslo Messaging
-* July: greenio executor, `[openstack-dev] [oslo] Asyncio and oslo.messaging
+* July 2014: greenio executor, `[openstack-dev] [oslo] Asyncio and oslo.messaging
   <http://lists.openstack.org/pipermail/openstack-dev/2014-July/039291.html>`_
 
 First try with a trollius executor for Oslo Messaging:
@@ -186,3 +235,11 @@ First discussion around asyncio and OpenStack:
   <https://blueprints.launchpad.net/oslo.messaging/+spec/asyncio-executor>`_
   proposed by Flavio Percoco and accepted for OpenStack Icehouse by Mark
   McLoughlin
+
+
+History of asynchronous programming in OpenStack
+------------------------------------------------
+
+In the past, the Nova project used Tornado, then Twisted and it is now using
+eventlet which also became the defacto standard in OpenStack
+

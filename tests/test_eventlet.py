@@ -292,7 +292,7 @@ class WrapGreenthreadTests(tests.TestCase):
         self.loop.set_debug(False)
         gt = eventlet.spawn(func)
         msg = "wrap_greenthread: the greenthread is running"
-        self.assertRaisesRegexp(RuntimeError, msg, gt.wait)
+        self.assertRaisesRegex(RuntimeError, msg, gt.wait)
 
     def test_wrap_greenthread_dead(self):
         def func():
@@ -303,8 +303,8 @@ class WrapGreenthreadTests(tests.TestCase):
         self.assertEqual(result, 'ok')
 
         msg = "wrap_greenthread: the greenthread already finished"
-        self.assertRaisesRegexp(RuntimeError, msg,
-                                aioeventlet.wrap_greenthread, gt)
+        self.assertRaisesRegex(RuntimeError, msg,
+                               aioeventlet.wrap_greenthread, gt)
 
     def test_coro_wrap_greenthread(self):
         result = self.loop.run_until_complete(coro_wrap_greenthread())
@@ -358,7 +358,7 @@ class WrapGreenletTests(tests.TestCase):
 
         eventlet.spawn_n(func)
         msg = "wrap_greenthread: the greenthread is running"
-        self.assertRaisesRegexp(RuntimeError, msg, event.wait)
+        self.assertRaisesRegex(RuntimeError, msg, event.wait)
 
     def test_wrap_greenlet_dead(self):
         event = eventlet.event.Event()
@@ -368,7 +368,7 @@ class WrapGreenletTests(tests.TestCase):
         gt = eventlet.spawn_n(func)
         event.wait()
         msg = "wrap_greenthread: the greenthread already finished"
-        self.assertRaisesRegexp(RuntimeError, msg, aioeventlet.wrap_greenthread, gt)
+        self.assertRaisesRegex(RuntimeError, msg, aioeventlet.wrap_greenthread, gt)
 
 
 if __name__ == '__main__':
