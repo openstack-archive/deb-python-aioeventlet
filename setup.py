@@ -18,7 +18,9 @@
 #
 #  - hg tag X.Y
 #  - hg push
-#  - python setup.py sdist bdist_wheel register upload
+#  - python setup.py sdist register upload
+#    WARNING: don't publish binary wheel packages, since setup.py
+#             hardcodes dependencies depending on the Python version.
 #  - increment version in setup.py and doc/conf.py
 #  - hg ci && hg push
 #
@@ -53,7 +55,7 @@ with open("README") as fp:
 
 install_options = {
     "name": "aioeventlet",
-    "version": "0.5",
+    "version": "0.6",
     "license": "Apache License 2.0",
     "author": 'Victor Stinner',
     "author_email": 'victor.stinner@gmail.com',
