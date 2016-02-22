@@ -3,12 +3,12 @@ Upstream-Name: aioeventlet
 Upstream-Contact: Victor Stinner <victor.stinner@gmail.com>
 Source: hg::https://bitbucket.org/haypo/aioeventlet
 
-Files: debian/*
-Copyright: (c) 2014, Thomas Goirand <zigo@debian.org>
+Files: *
+Copyright: (c) 2013-2016, Victor Stinner <victor.stinner@gmail.com>
 License: Apache-2
 
-Files: *
-Copyright: (c) 2013, Victor Stinner <victor.stinner@gmail.com>
+Files: debian/*
+Copyright: (c) 2014-2016, Thomas Goirand <zigo@debian.org>
 License: Apache-2
 
 License: Apache-2
