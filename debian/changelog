@@ -1,4 +1,4 @@
-python-aioeventlet (0.5-1) unstable; urgency=medium
+python-aioeventlet (0.5.1-1) unstable; urgency=medium
 
   * New upstream release:
     - Fixed bug related to monkey-patching of eventlet (Closes: #815217).
