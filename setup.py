@@ -1,4 +1,5 @@
-# Release procedure:
+# Prepare a release:
+#
 #  - fill the changelog
 #  - run unit tests on Linux: run "tox"
 #  - run unit tests on Windows, run::
@@ -7,15 +8,24 @@
 #       \Python27\python.exe runtest.py -r -m
 #
 #  - update the version in setup.py and doc/conf.py to X.Y
-#  - set release date in doc/changelog.rst
 #  - check that "python setup.py sdist" contains all files tracked by
 #    the SCM (Mercurial): update MANIFEST.in if needed
+#  - set release date in doc/changelog.rst
 #  - hg ci
+#  - hg push
+#
+# Release a new version:
+#
 #  - hg tag X.Y
 #  - hg push
 #  - python setup.py sdist bdist_wheel register upload
 #  - increment version in setup.py and doc/conf.py
 #  - hg ci && hg push
+#
+# After the release:
+#
+#  - increment version in setup.py and doc/conf.py
+#  - hg ci -m "post-release" && hg push
 
 import sys
 try:

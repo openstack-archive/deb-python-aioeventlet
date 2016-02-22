@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Version 0.5
------------
+2016-02-22: Version 0.5
+-----------------------
 
 * Unit tests now use the aiotest library.
 * Fix for eventlet used with monkey-patching: inject the original threading
