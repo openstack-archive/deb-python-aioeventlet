@@ -5,6 +5,7 @@ python-aioeventlet (0.5-1) unstable; urgency=medium
   * Removed Pre-Depends: dpkg (>= 1.15.6~).
   * VCS fields using HTTPS.
   * Fixed debian/copyright ordering and years.
+  * Now also testing with Python3, since eventlet has support for it.
 
  -- Thomas Goirand <zigo@debian.org>  Mon, 22 Feb 2016 13:45:27 +0000
 

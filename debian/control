@@ -2,18 +2,20 @@ Source: python-aioeventlet
 Section: python
 Priority: optional
 Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
-Uploaders: Thomas Goirand <zigo@debian.org>
+Uploaders: Thomas Goirand <zigo@debian.org>,
 Build-Depends: debhelper (>= 9),
                dh-python,
                python-all (>= 2.6.6-3~),
                python-setuptools,
                python-sphinx,
                python3-all,
-               python3-setuptools
+               python3-setuptools,
 Build-Depends-Indep: python-eventlet,
                      python-mock,
-                     python-trollius (>= 0.3),
-                     python3-trollius (>= 0.3)
+                     python-trollius (>= 2.0),
+                     python3-eventlet,
+                     python3-mock,
+                     python3-trollius (>= 2.0),
 Standards-Version: 3.9.6
 Vcs-Browser: https://anonscm.debian.org/gitweb/?p=openstack/python-aioeventlet.git
 Vcs-Git: https://anonscm.debian.org/git/openstack/python-aioeventlet.git
@@ -23,8 +25,8 @@ Package: python-aioeventlet
 Architecture: all
 Depends: python-trollius (>= 0.3),
          ${misc:Depends},
-         ${python:Depends}
-Suggests: python-aioeventlet-doc
+         ${python:Depends},
+Suggests: python-aioeventlet-doc,
 Description: asyncio event loop scheduling callbacks in eventlet - Python 2.x
  aioeventlet implements the asyncio API (PEP 3156) on top of eventlet. It makes
  possible to write asyncio code in a project currently written for eventlet.
@@ -44,8 +46,8 @@ Description: asyncio event loop scheduling callbacks in eventlet - Python 2.x
 Package: python3-aioeventlet
 Architecture: all
 Depends: ${misc:Depends},
-         ${python3:Depends}
-Suggests: python-aioeventlet-doc
+         ${python3:Depends},
+Suggests: python-aioeventlet-doc,
 Description: asyncio event loop scheduling callbacks in eventlet - Python 3.x
  aioeventlet implements the asyncio API (PEP 3156) on top of eventlet. It makes
  possible to write asyncio code in a project currently written for eventlet.
@@ -65,7 +67,8 @@ Description: asyncio event loop scheduling callbacks in eventlet - Python 3.x
 Package: python-aioeventlet-doc
 Section: doc
 Architecture: all
-Depends: ${misc:Depends}, ${sphinxdoc:Depends}
+Depends: ${misc:Depends},
+         ${sphinxdoc:Depends},
 Description: asyncio event loop scheduling callbacks in eventlet - doc
  aioeventlet implements the asyncio API (PEP 3156) on top of eventlet. It makes
  possible to write asyncio code in a project currently written for eventlet.
