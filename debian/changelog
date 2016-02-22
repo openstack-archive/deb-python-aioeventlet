@@ -1,3 +1,10 @@
+python-aioeventlet (0.5-1) unstable; urgency=medium
+
+  * New upstream release:
+    - Fixed bug related to monkey-patching of eventlet (Closes: #815217).
+
+ -- Thomas Goirand <zigo@debian.org>  Mon, 22 Feb 2016 13:45:27 +0000
+
 python-aioeventlet (0.4-1) unstable; urgency=medium
 
   * Initial release. (Closes: #778542)
