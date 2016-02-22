@@ -2,6 +2,8 @@ python-aioeventlet (0.5-1) unstable; urgency=medium
 
   * New upstream release:
     - Fixed bug related to monkey-patching of eventlet (Closes: #815217).
+  * Removed Pre-Depends: dpkg (>= 1.15.6~).
+  * VCS fields using HTTPS.
 
  -- Thomas Goirand <zigo@debian.org>  Mon, 22 Feb 2016 13:45:27 +0000
 
