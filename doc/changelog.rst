@@ -1,7 +1,15 @@
 Changelog
 =========
 
-* aioeventlet API is now considered as stable
+Version 0.5
+-----------
+
+* Unit tests now use the aiotest library.
+* Fix for eventlet used with monkey-patching: inject the original threading
+  module and the original threading.get_ident() function in
+  asyncio.base_events.
+* Drop support for Python 2.6 and Python 3.2. aioeventlet depends on trollius
+  and pip which don't support these Python versions anymore.
 
 2014-12-03: Version 0.4
 -----------------------

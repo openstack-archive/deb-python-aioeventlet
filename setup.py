@@ -35,7 +35,7 @@ elif (3, 3) <= sys.version_info < (3, 4):
     # Python 3.3: use Tulip
     requirements.append('asyncio>=0.4.1')
 else:
-    # Python 2.6-3.2: use Trollius
+    # Python 2.7: use Trollius
     requirements.append('trollius>=0.3')
 
 with open("README") as fp:
