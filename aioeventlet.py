@@ -206,6 +206,12 @@ class EventLoop(asyncio.SelectorEventLoop):
         if eventlet.patcher.is_monkey_patched('thread'):
             self._default_executor = _TpoolExecutor(self)
 
+    def stop(self):
+        super(EventLoop, self).stop()
+        # selector.select() is running: write into the self-pipe to wake up
+        # the selector
+        self._write_to_self()
+
     def call_soon(self, callback, *args):
         handle = super(EventLoop, self).call_soon(callback, *args)
         if self._selector is not None and self._selector._event:
