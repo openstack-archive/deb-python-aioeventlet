@@ -14,8 +14,8 @@ aioeventlet allows to use greenthreads in asyncio coroutines, and to use asyncio
 coroutines, tasks and futures in greenthreads: see :func:`yield_future` and
 :func:`wrap_greenthread` functions.
 
-The main visible difference between aioeventlet and trollius is the behaviour of
-``run_forever()``: ``run_forever()`` blocks with trollius, whereas it runs in a
+The main visible difference between aioeventlet and asyncio is the behaviour of
+``run_forever()``: ``run_forever()`` blocks with asyncio, whereas it runs in a
 greenthread with aioeventlet. It means that aioeventlet event loop can run in an
 greenthread while the Python main thread runs other greenthreads in parallel.
 

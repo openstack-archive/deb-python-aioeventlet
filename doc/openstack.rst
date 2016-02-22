@@ -1,6 +1,12 @@
 asyncio in OpenStack
 ====================
 
+.. warning::
+   The project of replacing eventlet with trollius using aioeventlet in
+   OpenStack is abandonned. It might done "later" when Python 2 support
+   will be removed from OpenStack which is not going to happen in a near
+   future.
+
 First part (in progress): add support for trollius coroutines
 -------------------------------------------------------------
 
