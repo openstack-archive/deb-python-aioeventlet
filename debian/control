@@ -17,8 +17,8 @@ Build-Depends-Indep: python-eventlet,
                      python3-mock,
                      python3-trollius (>= 2.0),
 Standards-Version: 3.9.6
-Vcs-Browser: https://anonscm.debian.org/gitweb/?p=openstack/python-aioeventlet.git
-Vcs-Git: https://anonscm.debian.org/git/openstack/python-aioeventlet.git
+Vcs-Browser: https://git.openstack.org/cgit/openstack/deb-python-aioeventlet?h=debian%2Fnewton
+Vcs-Git: https://git.openstack.org/openstack/deb-python-aioeventlet -b debian/newton
 Homepage: http://aioeventlet.readthedocs.org/
 
 Package: python-aioeventlet
