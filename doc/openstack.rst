@@ -158,19 +158,19 @@ Threads and asyncio specs:
 Maybe the good one, aioeventlet project:
 
 * March 13, 2015: Joshua Harlow wrote the spec `Replace eventlet +
-  monkey-patching with ?? <https://review.openstack.org/#/c/164035/>`_
+  monkey-patching with ?? <https://review.opendev.org/#/c/164035/>`_
 * February 17, 2015: Joshua Harlow wrote a different spec,
   `Sew over eventlet + patching with threads
-  <https://review.openstack.org/#/c/156711/>`_
+  <https://review.opendev.org/#/c/156711/>`_
 * February 5, 2015: new cross-project spec `Replace eventlet with asyncio
-  <https://review.openstack.org/#/c/153298/>`_
+  <https://review.opendev.org/#/c/153298/>`_
 * December 3, 2014: two patches posted to requirements:
-  `Add aioeventlet dependency <https://review.openstack.org/#/c/138750/>`_
-  and `Drop greenio dependency <https://review.openstack.org/#/c/138748/>`_.
+  `Add aioeventlet dependency <https://review.opendev.org/#/c/138750/>`_
+  and `Drop greenio dependency <https://review.opendev.org/#/c/138748/>`_.
 * Novembre 23, 2014: two patches posted to Oslo Messaging:
-  `Add a new aioeventlet executor <https://review.openstack.org/#/c/136653/>`_
+  `Add a new aioeventlet executor <https://review.opendev.org/#/c/136653/>`_
   and `Add an optional executor callback to dispatcher
-  <https://review.openstack.org/#/c/136652/>`_
+  <https://review.opendev.org/#/c/136652/>`_
 * November 19, 2014: First release of the aioeventlet project
 
 OpenStack Kilo Summit, November 3-7, 2014, at Paris:
@@ -196,40 +196,40 @@ New try with a greenio executor for Oslo Messaging:
 * July 24, 2014: `Add greenio dependency <https://review.openstack.org/108637>`_
   merged into openstack/requirements
 * July 22, 2014: Patch `Add a new greenio executor
-  <https://review.openstack.org/#/c/108652/>`_ proposed to Oslo Messaging
+  <https://review.opendev.org/#/c/108652/>`_ proposed to Oslo Messaging
 * July 21, 2014: Release of greenio 0.6 which is now compatible with Trollius
 * July 21, 2014: Release of Trollius 1.0
 * July 14, 2014: Patch `Add a 'greenio' oslo.messaging executor (spec)
-  <https://review.openstack.org/#/c/104792/>`_ merged into openstack/oslo-specs.
+  <https://review.opendev.org/#/c/104792/>`_ merged into openstack/oslo-specs.
 * July 7, 2014: Patch `Fix AMQPListener for polling with timeout
-  <https://review.openstack.org/#/c/104964/>`_ merged into Oslo Messaging
+  <https://review.opendev.org/#/c/104964/>`_ merged into Oslo Messaging
 * July 2014: greenio executor, `[openstack-dev] [oslo] Asyncio and oslo.messaging
   <http://lists.openstack.org/pipermail/openstack-dev/2014-July/039291.html>`_
 
 First try with a trollius executor for Oslo Messaging:
 
 * June 20, 2014: Patch `Add an optional timeout parameter to Listener.poll
-  <https://review.openstack.org/#/c/71003/>`_ merged into Oslo Messaging
+  <https://review.opendev.org/#/c/71003/>`_ merged into Oslo Messaging
 * May 28, 2014: Meeting at OpenStack in action with Doug Hellman, Julien
   Danjou, Mehdi Abaakouk, Victor Stinner and Christophe to discuss the plan to
   port OpenStack to Python 3 and switch from eventlet to asyncio.
 * April 23, 2014: Patch `Allow trollius 0.2
-  <https://review.openstack.org/#/c/79901/>`_ merged into
+  <https://review.opendev.org/#/c/79901/>`_ merged into
   openstack/requirements
 * March 21, 2014: Patch `Replace ad-hoc coroutines with Trollius coroutines
-  <https://review.openstack.org/#/c/77925/>`_ proposed to Heat. Heat coroutines
+  <https://review.opendev.org/#/c/77925/>`_ proposed to Heat. Heat coroutines
   are close to Trollius coroutines. Patch abandonned, need to be rewritten,
   maybe with aioeventlet.
 * February 20, 2014: The full specification of the blueprint was written:
   `Oslo/blueprints/asyncio
   <https://wiki.openstack.org/wiki/Oslo/blueprints/asyncio>`_
 * February 8, 2014: Patch `Add a new dependency: trollius
-  <https://review.openstack.org/#/c/70983/>`_ merged into
+  <https://review.opendev.org/#/c/70983/>`_ merged into
   openstack/requirements
 * February 27, 2014: Article `Use the new asyncio module and Trollius in OpenStack
   <http://techs.enovance.com/6562/asyncio-openstack-python3>`_ published
 * February 4, 2014: Patch `Add a new asynchronous executor based on Trollius
-  <https://review.openstack.org/#/c/70948/>`_ proposed to Oslo Messaging,
+  <https://review.opendev.org/#/c/70948/>`_ proposed to Oslo Messaging,
   but it was abandonned. Running a classic Trollius event loop in a dedicated
   thread doesn't fit well into eventlet event loop.
 
